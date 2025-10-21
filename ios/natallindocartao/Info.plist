@@ -28,14 +28,13 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-	  <!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -50,5 +49,703 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>!The Black Bloc Bold Italic.ttf</string>
+		<string>!The Black Bloc Bold.ttf</string>
+		<string>!The Black Bloc Italic.ttf</string>
+		<string>!The Black Bloc Regular.ttf</string>
+		<string>08 Underground.ttf</string>
+		<string>1942 Report.ttf</string>
+		<string>36 Days Ago Bold.ttf</string>
+		<string>36 Days Ago Regular.ttf</string>
+		<string>50 Blizzards.ttf</string>
+		<string>8 Bit Wonder.ttf</string>
+		<string>A Dripping Marker.ttf</string>
+		<string>Aaaiight! Bold.ttf</string>
+		<string>Aaaiight! Regular.ttf</string>
+		<string>Aardvark Cafe.ttf</string>
+		<string>Adolphus Serif.ttf</string>
+		<string>Adolphus.ttf</string>
+		<string>African.ttf</string>
+		<string>Agafont.ttf</string>
+		<string>Airmole Antique.ttf</string>
+		<string>Airmole Regular.ttf</string>
+		<string>Airmole Shaded.ttf</string>
+		<string>Airmole Stripe.ttf</string>
+		<string>Alanus.ttf</string>
+		<string>Aldo.ttf</string>
+		<string>All Hooked Up.ttf</string>
+		<string>Almonte.ttf</string>
+		<string>Alpha 54.ttf</string>
+		<string>Alphabits Fat.ttf</string>
+		<string>Alphabits Light.ttf</string>
+		<string>Alphabits Regular.ttf</string>
+		<string>Amerika Sans.ttf</string>
+		<string>Antelope.ttf</string>
+		<string>Arabolical.ttf</string>
+		<string>Archeologicaps.ttf</string>
+		<string>Architek.ttf</string>
+		<string>Art Brush.ttf</string>
+		<string>Artistica.ttf</string>
+		<string>Astrud.ttf</string>
+		<string>Augusta Shadow.ttf</string>
+		<string>Augusta.ttf</string>
+		<string>Averia Bold Italic.ttf</string>
+		<string>Averia Bold.ttf</string>
+		<string>Averia Gruesa.ttf</string>
+		<string>Averia Italic.ttf</string>
+		<string>Averia Light Italic.ttf</string>
+		<string>Averia Light.ttf</string>
+		<string>Averia Regular.ttf</string>
+		<string>Averia Serif Bold Italic.ttf</string>
+		<string>Averia Serif Bold.ttf</string>
+		<string>Averia Serif Italic.ttf</string>
+		<string>Averia Serif Light Italic.ttf</string>
+		<string>Averia Serif Light.ttf</string>
+		<string>Averia Serif Regular.ttf</string>
+		<string>B-Boy.ttf</string>
+		<string>Bad Boys.ttf</string>
+		<string>Bajenna.ttf</string>
+		<string>Baldur Shadow.ttf</string>
+		<string>Baldur.ttf</string>
+		<string>Beagle Brigade.ttf</string>
+		<string>Benegraphic.ttf</string>
+		<string>Berlin Allee Semi Bold.ttf</string>
+		<string>Berlin Allee.ttf</string>
+		<string>Berylium Bold Italic.ttf</string>
+		<string>Berylium Bold.ttf</string>
+		<string>Berylium Italic.ttf</string>
+		<string>Berylium Regular.ttf</string>
+		<string>Beta 54.ttf</string>
+		<string>Big Head.ttf</string>
+		<string>Big Mummy.ttf</string>
+		<string>Black Jack.ttf</string>
+		<string>Blax Slab XXL.ttf</string>
+		<string>Blues MK2.ttf</string>
+		<string>Bodonitown.ttf</string>
+		<string>Bogotana Bold Italic.ttf</string>
+		<string>Bogotana Bold.ttf</string>
+		<string>Bogotana Italic.ttf</string>
+		<string>Bogotana Light Italic.ttf</string>
+		<string>Bogotana Light.ttf</string>
+		<string>Bogotana Regular.ttf</string>
+		<string>Bogusflow.ttf</string>
+		<string>Bolonewt.ttf</string>
+		<string>Bones Font.ttf</string>
+		<string>Bonzer San Francisco.ttf</string>
+		<string>Borg.ttf</string>
+		<string>Boston Traffic.ttf</string>
+		<string>Breamcatcher.ttf</string>
+		<string>Brush Of Kent.ttf</string>
+		<string>Bud Null.ttf</string>
+		<string>Bullpen HV Italic.ttf</string>
+		<string>Bullpen HV.ttf</string>
+		<string>Bullpen Three D.ttf</string>
+		<string>Caligula Dodgy.ttf</string>
+		<string>Carbon Blade.ttf</string>
+		<string>CarbonType.ttf</string>
+		<string>Carbona.ttf</string>
+		<string>Cardinal Alternate.ttf</string>
+		<string>Cardinal.ttf</string>
+		<string>Cargo Crate.ttf</string>
+		<string>Cat Shop.ttf</string>
+		<string>Chang  And Eng.ttf</string>
+		<string>Chantelli Antiqua.ttf</string>
+		<string>Chicago by Benj Funk.ttf</string>
+		<string>Chinese Calligraphy.ttf</string>
+		<string>Chisel Script.ttf</string>
+		<string>Chow Fun.ttf</string>
+		<string>Chrome Yellow.ttf</string>
+		<string>Class A.ttf</string>
+		<string>Cleopatra.ttf</string>
+		<string>Cliff Edge.ttf</string>
+		<string>Colourbars Bold.ttf</string>
+		<string>Colourbars.ttf</string>
+		<string>Concrete Shoes.ttf</string>
+		<string>Corleone Due.ttf</string>
+		<string>Corleone.ttf</string>
+		<string>Corporate HQ.ttf</string>
+		<string>Crack.ttf</string>
+		<string>Crazy Crazy.ttf</string>
+		<string>Credit River.ttf</string>
+		<string>Crop Types.ttf</string>
+		<string>Crystal Radio Kit.ttf</string>
+		<string>Currency Regular.ttf</string>
+		<string>Currency Slanted.ttf</string>
+		<string>DJ Gross.ttf</string>
+		<string>Damaged.ttf</string>
+		<string>Delitsch Antiqua.ttf</string>
+		<string>Deng Thick.ttf</string>
+		<string>Deutsch Gothic.ttf</string>
+		<string>Digicity.ttf</string>
+		<string>Digit.ttf</string>
+		<string>Diogenes.ttf</string>
+		<string>Discoid.ttf</string>
+		<string>Display Free TFB.ttf</string>
+		<string>Dominican Italic.ttf</string>
+		<string>Dominican Small Caps.ttf</string>
+		<string>Dominican.ttf</string>
+		<string>Don Aquarel.ttf</string>
+		<string>Doughnut Monster.ttf</string>
+		<string>Dream Orphans Bold Italic.ttf</string>
+		<string>Dream Orphans Bold.ttf</string>
+		<string>Dream Orphans Italic.ttf</string>
+		<string>Dream Orphans.ttf</string>
+		<string>Duality.ttf</string>
+		<string>Duvall Bold.ttf</string>
+		<string>Duvall Condensed Bold.ttf</string>
+		<string>Duvall Condensed.ttf</string>
+		<string>Duvall Outline.ttf</string>
+		<string>Duvall Small Caps Bold.ttf</string>
+		<string>Duvall Small Caps Condensed Bold.ttf</string>
+		<string>Duvall Small Caps Condensed.ttf</string>
+		<string>Duvall Small Caps Outline.ttf</string>
+		<string>Duvall Small Caps.ttf</string>
+		<string>Duvall.ttf</string>
+		<string>East Market.ttf</string>
+		<string>Echelon Italic.ttf</string>
+		<string>Echelon.ttf</string>
+		<string>Edmunds Distressed.ttf</string>
+		<string>Edmunds.ttf</string>
+		<string>Edo SZ.ttf</string>
+		<string>Eight One.ttf</string>
+		<string>Eirik Raude.ttf</string>
+		<string>Elementary Gothic Bookhand.ttf</string>
+		<string>Episode 1.ttf</string>
+		<string>Epistolar.ttf</string>
+		<string>Epitough.ttf</string>
+		<string>Epittazio.ttf</string>
+		<string>Ethnocentric Italic.ttf</string>
+		<string>Ethnocentric Regular.ttf</string>
+		<string>Etobicoke.ttf</string>
+		<string>Euphorigenic.ttf</string>
+		<string>Expresiva.ttf</string>
+		<string>Express.ttf</string>
+		<string>Expressway.ttf</string>
+		<string>F25 Bank Printer Bold.ttf</string>
+		<string>F25 Bank Printer.ttf</string>
+		<string>FRS Genuino.ttf</string>
+		<string>Fairfax Station.ttf</string>
+		<string>Fashion Victim.ttf</string>
+		<string>Fat Wedge.ttf</string>
+		<string>Felt Pen.ttf</string>
+		<string>Festival Jomfruer.ttf</string>
+		<string>Fette Mikado.ttf</string>
+		<string>Fine Stencil.ttf</string>
+		<string>Fixxed.ttf</string>
+		<string>Flow.ttf</string>
+		<string>Flux Architect Bold Italic.ttf</string>
+		<string>Flux Architect Bold.ttf</string>
+		<string>Flux Architect Italic.ttf</string>
+		<string>Flux Architect Regular.ttf</string>
+		<string>Folks Black.ttf</string>
+		<string>Folks Bold.ttf</string>
+		<string>Folks Heavy.ttf</string>
+		<string>Folks Light.ttf</string>
+		<string>Folks Normal.ttf</string>
+		<string>Folks Shades.ttf</string>
+		<string>Folks XX Heavy.ttf</string>
+		<string>Font Penetration.ttf</string>
+		<string>Font Shui.ttf</string>
+		<string>Foo.ttf</string>
+		<string>Forgotten Futurist Bold Italic.ttf</string>
+		<string>Forgotten Futurist Bold.ttf</string>
+		<string>Forgotten Futurist Italic.ttf</string>
+		<string>Forgotten Futurist.ttf</string>
+		<string>Forgotten.ttf</string>
+		<string>Forty Script.ttf</string>
+		<string>Fountain.ttf</string>
+		<string>Friday.ttf</string>
+		<string>Game Plan.ttf</string>
+		<string>Gang Of Three.ttf</string>
+		<string>Gaps.ttf</string>
+		<string>Gartentika.ttf</string>
+		<string>Gismonda FG.ttf</string>
+		<string>Goma Western.ttf</string>
+		<string>Gomo.ttf</string>
+		<string>Goodfish Bold Italic.ttf</string>
+		<string>Goodfish Bold.ttf</string>
+		<string>Goodfish Italic.ttf</string>
+		<string>Goodfish Regular.ttf</string>
+		<string>Gooooly.ttf</string>
+		<string>Goth Goma.ttf</string>
+		<string>Gothic 45.ttf</string>
+		<string>Graffiti Font.ttf</string>
+		<string>Graffiti Poster.ttf</string>
+		<string>Graffont.ttf</string>
+		<string>Gramophone NF.ttf</string>
+		<string>Graphic CAT.ttf</string>
+		<string>Grass.ttf</string>
+		<string>Grave Digger.ttf</string>
+		<string>Great Lakes NF.ttf</string>
+		<string>Greenbeans.ttf</string>
+		<string>Hall Fetica Decompose Italic.ttf</string>
+		<string>Hall Fetica Decompose.ttf</string>
+		<string>Hall Fetica Italic.ttf</string>
+		<string>Hall Fetica Narrow Italic.ttf</string>
+		<string>Hall Fetica Narrow.ttf</string>
+		<string>Hall Fetica Upper Decompose It.ttf</string>
+		<string>Hall Fetica Upper Decompose.ttf</string>
+		<string>Hall Fetica Upper Italic.ttf</string>
+		<string>Hall Fetica Upper.ttf</string>
+		<string>Hall Fetica Wide.ttf</string>
+		<string>Hall Fetica.ttf</string>
+		<string>Happy Hell.ttf</string>
+		<string>Hard Edge.ttf</string>
+		<string>Heavy Heap.ttf</string>
+		<string>Herkules.ttf</string>
+		<string>High Sans Serif 7.ttf</string>
+		<string>Highlander.ttf</string>
+		<string>Highway Gothic Condensed.ttf</string>
+		<string>Highway Gothic Expanded.ttf</string>
+		<string>Highway Gothic Narrow.ttf</string>
+		<string>Highway Gothic.ttf</string>
+		<string>Hit the Road.ttf</string>
+		<string>Holla Script.ttf</string>
+		<string>Home Remedy.ttf</string>
+		<string>Hostias.ttf</string>
+		<string>Hotel Oriental.ttf</string>
+		<string>Humana.ttf</string>
+		<string>Hydra.ttf</string>
+		<string>Ibiza.ttf</string>
+		<string>Ice Age.ttf</string>
+		<string>Icicle Country Two.ttf</string>
+		<string>Indira K.ttf</string>
+		<string>Infinita.ttf</string>
+		<string>Inglobal Bold Italic.ttf</string>
+		<string>Inglobal Bold.ttf</string>
+		<string>Inglobal Italic.ttf</string>
+		<string>Inglobal.ttf</string>
+		<string>Inky Dinky.ttf</string>
+		<string>Inspyratta.ttf</string>
+		<string>Interact.ttf</string>
+		<string>Intuitive.ttf</string>
+		<string>Isaac Script 2.ttf</string>
+		<string>Italexico.ttf</string>
+		<string>JD Equinox.ttf</string>
+		<string>JSA Lovechinese.ttf</string>
+		<string>JSL Ancient Italic.ttf</string>
+		<string>JSL Ancient.ttf</string>
+		<string>Jam Pact.ttf</string>
+		<string>Jelly.ttf</string>
+		<string>Jose de Oliveira.ttf</string>
+		<string>Juanalzada.ttf</string>
+		<string>June Bug Stomp NF.ttf</string>
+		<string>Jungle Fever.ttf</string>
+		<string>Just for Fun.ttf</string>
+		<string>KS Brush.ttf</string>
+		<string>Kana.ttf</string>
+		<string>Karate.ttf</string>
+		<string>Kells SD.ttf</string>
+		<string>Kelt Caps Freehand.ttf</string>
+		<string>Kelvinized.ttf</string>
+		<string>Kenyan Coffee Bold Italic.ttf</string>
+		<string>Kenyan Coffee Bold.ttf</string>
+		<string>Kenyan Coffee Italic.ttf</string>
+		<string>Kenyan Coffee.ttf</string>
+		<string>Kilsonburg.ttf</string>
+		<string>Kimberley BL.ttf</string>
+		<string>Kingthings Exeter.ttf</string>
+		<string>Kingthings Facetype.ttf</string>
+		<string>Kingthings Petrock light.ttf</string>
+		<string>Kingthings Petrock.ttf</string>
+		<string>Kingthings Sans.ttf</string>
+		<string>Kirsty Bold Italic.ttf</string>
+		<string>Kirsty Bold.ttf</string>
+		<string>Kirsty Ink.ttf</string>
+		<string>Kirsty Italic.ttf</string>
+		<string>Kirsty Regular.ttf</string>
+		<string>Kitchen.ttf</string>
+		<string>Know Your Product.ttf</string>
+		<string>Konfuciuz Fat.ttf</string>
+		<string>Konfuciuz Thin.ttf</string>
+		<string>Konfuciuz.ttf</string>
+		<string>Kong.ttf</string>
+		<string>Korean Calligraphy.ttf</string>
+		<string>Kremlin Comrade.ttf</string>
+		<string>Kshandwrt.ttf</string>
+		<string>La Mamucha.ttf</string>
+		<string>La Unica.ttf</string>
+		<string>Landsdowne.ttf</string>
+		<string>Lansbury FG.ttf</string>
+		<string>Lasso Of Truth.ttf</string>
+		<string>Leo Arrow.ttf</string>
+		<string>Lesser Concern Shadow.ttf</string>
+		<string>Lesser Concern.ttf</string>
+		<string>Lickspittle.ttf</string>
+		<string>Lignum Melle.ttf</string>
+		<string>Livingstone.ttf</string>
+		<string>Logobloqo 2.ttf</string>
+		<string>London Between.ttf</string>
+		<string>London MM.ttf</string>
+		<string>London Two.ttf</string>
+		<string>Lord Juusai.ttf</string>
+		<string>Lowery Regular.ttf</string>
+		<string>Lunch.ttf</string>
+		<string>Lupinus.ttf</string>
+		<string>Luxembourg 1910 Shadow.ttf</string>
+		<string>Luxembourg 1910.ttf</string>
+		<string>MCapitals.ttf</string>
+		<string>MK Abel.ttf</string>
+		<string>MK Latino Plain.ttf</string>
+		<string>MK Stencil Sans Black.ttf</string>
+		<string>MKorsair.ttf</string>
+		<string>Made in China.ttf</string>
+		<string>Magnus Jockey.ttf</string>
+		<string>Majetto.ttf</string>
+		<string>Marela.ttf</string>
+		<string>Maritime Sans Bold.ttf</string>
+		<string>Maritime Sans Extra Bold.ttf</string>
+		<string>Maritime Sans.ttf</string>
+		<string>Maropawi Club.ttf</string>
+		<string>Mary Jane Alternate.ttf</string>
+		<string>Mary Jane Antique.ttf</string>
+		<string>Mary Jane Cavazos.ttf</string>
+		<string>Mary Jane Gilardino.ttf</string>
+		<string>Mary Jane Larabie.ttf</string>
+		<string>Mary Jane Meade.ttf</string>
+		<string>Mary Jane Olyff.ttf</string>
+		<string>Mary Jane Small Caps.ttf</string>
+		<string>Mary Jane Tankard.ttf</string>
+		<string>Mary Jane Windlin.ttf</string>
+		<string>Mary Jane deGroot.ttf</string>
+		<string>Matthan Sans Italic.ttf</string>
+		<string>Matthan Sans Regular.ttf</string>
+		<string>Mayangsari.ttf</string>
+		<string>Meditation.ttf</string>
+		<string>Metropolis.ttf</string>
+		<string>MetropolisNF.ttf</string>
+		<string>Micursif.ttf</string>
+		<string>Midland Rail NF.ttf</string>
+		<string>Mighty Mighty Friars.ttf</string>
+		<string>Mignone.ttf</string>
+		<string>Milenio-jed.ttf</string>
+		<string>Milk Run.ttf</string>
+		<string>Minya.ttf</string>
+		<string>Mirage Gothic.ttf</string>
+		<string>Mirage Italic.ttf</string>
+		<string>Mirage.ttf</string>
+		<string>Mocha Book Regular.ttf</string>
+		<string>Mocha Condensed Regular.ttf</string>
+		<string>Mocha Extended Regular.ttf</string>
+		<string>Mocha Regular.ttf</string>
+		<string>Modern Curve.ttf</string>
+		<string>Moderne Fraktur.ttf</string>
+		<string>Mogambo!.ttf</string>
+		<string>Mold Papa.ttf</string>
+		<string>Monika Bold.ttf</string>
+		<string>Monika.ttf</string>
+		<string>Monkey Phonics.ttf</string>
+		<string>Monkey.ttf</string>
+		<string>Monograms Toolbox.ttf</string>
+		<string>Morevil.ttf</string>
+		<string>Morning Karashi.ttf</string>
+		<string>Morning Wasabi.ttf</string>
+		<string>Morris Roman Black Alt.ttf</string>
+		<string>Morris Roman Black.ttf</string>
+		<string>Mortis.ttf</string>
+		<string>Mostlios.ttf</string>
+		<string>Mousou Record.ttf</string>
+		<string>Movie Letters.ttf</string>
+		<string>Mr Skae.ttf</string>
+		<string>Mudshovel.ttf</string>
+		<string>Mura-Knockout.ttf</string>
+		<string>MutantA Medium Oblique.ttf</string>
+		<string>Myndraine.ttf</string>
+		<string>NFS Font.ttf</string>
+		<string>Napapiiri.ttf</string>
+		<string>Nashville.ttf</string>
+		<string>Nebraska.ttf</string>
+		<string>Nendo.ttf</string>
+		<string>Neretta Beveled.ttf</string>
+		<string>Neretta Outline.ttf</string>
+		<string>Neretta Shadow.ttf</string>
+		<string>Neretta.ttf</string>
+		<string>New Cicle Fina Italic.ttf</string>
+		<string>New Cicle Fina.ttf</string>
+		<string>New Cicle Gordita Italic.ttf</string>
+		<string>New Cicle Gordita.ttf</string>
+		<string>New Cicle Semi Italic.ttf</string>
+		<string>New Cicle Semi.ttf</string>
+		<string>New Stencil TFB.ttf</string>
+		<string>Newbie Serif.ttf</string>
+		<string>Night Court.ttf</string>
+		<string>Ninja Naruto.ttf</string>
+		<string>Ninja Penguin.ttf</string>
+		<string>Nisaba.ttf</string>
+		<string>Nouveau IBM Stretch.ttf</string>
+		<string>Nouveau IBM.ttf</string>
+		<string>Nulshock Bold.ttf</string>
+		<string>Octin College.ttf</string>
+		<string>Old Book.ttf</string>
+		<string>Old London Alternate.ttf</string>
+		<string>Old London.ttf</string>
+		<string>Old Newspaper Types.ttf</string>
+		<string>Old Skool Graff.ttf</string>
+		<string>Old Typefaces.ttf</string>
+		<string>Olde Chicago.ttf</string>
+		<string>OliJo Bold.ttf</string>
+		<string>Omotenashi.ttf</string>
+		<string>Once Upon A Time.ttf</string>
+		<string>One Way.ttf</string>
+		<string>Orchidee Light.ttf</string>
+		<string>Orchidee Medium.ttf</string>
+		<string>Organic Fruit.ttf</string>
+		<string>Origin Bold.ttf</string>
+		<string>Origin Extra Bold.ttf</string>
+		<string>Origin Light.ttf</string>
+		<string>Origin Regular.ttf</string>
+		<string>Osaka Sans Serif.ttf</string>
+		<string>PAC Libertas.ttf</string>
+		<string>Pacifica.ttf</string>
+		<string>Painty Paint.ttf</string>
+		<string>Palovsky.ttf</string>
+		<string>Paragon Cleaners Black.ttf</string>
+		<string>Paragon Cleaners Medium.ttf</string>
+		<string>Pasundan.ttf</string>
+		<string>Patinio Graffiti.ttf</string>
+		<string>Peake Bold.ttf</string>
+		<string>Peake Doubled.ttf</string>
+		<string>Peake Shadow.ttf</string>
+		<string>Peake Squat Bold.ttf</string>
+		<string>Peake Squat.ttf</string>
+		<string>Peake.ttf</string>
+		<string>Pehuensito.ttf</string>
+		<string>Penguin Sans.ttf</string>
+		<string>PentaGram's Salemica Eximius.ttf</string>
+		<string>PentaGram's Salemica.ttf</string>
+		<string>Petitscript Italic.ttf</string>
+		<string>Petitscript.ttf</string>
+		<string>Pharmacy.ttf</string>
+		<string>Philosopher Bold Italic.ttf</string>
+		<string>Philosopher Bold.ttf</string>
+		<string>Philosopher Italic.ttf</string>
+		<string>Philosopher Regular.ttf</string>
+		<string>Phoenix Sans Italic.ttf</string>
+		<string>Phoenix Sans.ttf</string>
+		<string>Phone Streak.ttf</string>
+		<string>Phrixus.ttf</string>
+		<string>Pinophyta.ttf</string>
+		<string>Pirata One.ttf</string>
+		<string>Pneumatics Tall.ttf</string>
+		<string>Pneumatics Wide.ttf</string>
+		<string>Pneumatics.ttf</string>
+		<string>Pompeji Petit.ttf</string>
+		<string>Popo.ttf</string>
+		<string>Port 118.ttf</string>
+		<string>Poseidon AOE.ttf</string>
+		<string>Poster Font.ttf</string>
+		<string>Poster Slab Caps.ttf</string>
+		<string>Prince Dub.ttf</string>
+		<string>Propaganda.ttf</string>
+		<string>Pundit.ttf</string>
+		<string>Pupcat.ttf</string>
+		<string>Puritan Alternate Bold.ttf</string>
+		<string>Puritan Swash Bold.ttf</string>
+		<string>Puritan.ttf</string>
+		<string>Qhytsdakx.ttf</string>
+		<string>Quael Gothic Condensed.ttf</string>
+		<string>Quael Gothic Hollow Italic.ttf</string>
+		<string>Quael Gothic Hollow Lefty Condensed.ttf</string>
+		<string>Quael Gothic Hollow Lefty.ttf</string>
+		<string>Quael Gothic Hollow.ttf</string>
+		<string>Quael Gothic Italic Condensed.ttf</string>
+		<string>Quael Gothic Italic.ttf</string>
+		<string>Quael Gothic Lefty Condensed.ttf</string>
+		<string>Quael Gothic Lefty.ttf</string>
+		<string>Quael Gothic.ttf</string>
+		<string>Quincaille Italic.ttf</string>
+		<string>Quincaille Outline Italic.ttf</string>
+		<string>Quincaille Outline.ttf</string>
+		<string>Quincaille.ttf</string>
+		<string>Quirkus Bold Italic.ttf</string>
+		<string>Quirkus Bold.ttf</string>
+		<string>Quirkus Italic.ttf</string>
+		<string>Quirkus Out.ttf</string>
+		<string>Quirkus Upside Down.ttf</string>
+		<string>Quirkus.ttf</string>
+		<string>RT DIY-Tape.ttf</string>
+		<string>Rafika.ttf</string>
+		<string>Rain &amp; Neer.ttf</string>
+		<string>Ramsey SD.ttf</string>
+		<string>Reactive.ttf</string>
+		<string>Rebel Caps.ttf</string>
+		<string>Rebel Redux.ttf</string>
+		<string>Reckoner Bold.ttf</string>
+		<string>Reckoner.ttf</string>
+		<string>Return To Castle.ttf</string>
+		<string>Rimouski.ttf</string>
+		<string>Riotun.ttf</string>
+		<string>Rita.ttf</string>
+		<string>Ritalin Bold.ttf</string>
+		<string>Ritalin Extra Bold.ttf</string>
+		<string>Ritalin.ttf</string>
+		<string>Ritzy Remix.ttf</string>
+		<string>River Avenue.ttf</string>
+		<string>Robust and Husky.ttf</string>
+		<string>Rocko.ttf</string>
+		<string>Rogaton Bold Italic.ttf</string>
+		<string>Rogaton Bold.ttf</string>
+		<string>Rogaton Italic.ttf</string>
+		<string>Rogaton.ttf</string>
+		<string>Rogers.ttf</string>
+		<string>Rolling No One Extra Bold.ttf</string>
+		<string>Roman Grid Caps.ttf</string>
+		<string>Roman SD.ttf</string>
+		<string>Romerati.ttf</string>
+		<string>Roskell.ttf</string>
+		<string>Rostock Kaligraph.ttf</string>
+		<string>Royal.ttf</string>
+		<string>Rugamika.ttf</string>
+		<string>Rundgotisch Rauh.ttf</string>
+		<string>Russian.ttf</string>
+		<string>Rutaban.ttf</string>
+		<string>SV Basic Manual Bold.ttf</string>
+		<string>SV Basic Manual.ttf</string>
+		<string>Saddlebag.ttf</string>
+		<string>Samurai.ttf</string>
+		<string>Sanctuary.ttf</string>
+		<string>Sarcophagus.ttf</string>
+		<string>Satyr Passionate.ttf</string>
+		<string>Scarface.ttf</string>
+		<string>Sci Fly Sans.ttf</string>
+		<string>Scratch.ttf</string>
+		<string>Seattle Sans.ttf</string>
+		<string>Secrets Stencil.ttf</string>
+		<string>Servus Text Display Italic.ttf</string>
+		<string>Sesame Shadow.ttf</string>
+		<string>Sesame.ttf</string>
+		<string>Shanghai.ttf</string>
+		<string>Simple Life.ttf</string>
+		<string>Skeleton Key.ttf</string>
+		<string>Skinny Minnie.ttf</string>
+		<string>Skitser Cartoon.ttf</string>
+		<string>Skitser Square.ttf</string>
+		<string>Slender Mini.ttf</string>
+		<string>Slender Stubby.ttf</string>
+		<string>Slender Wide.ttf</string>
+		<string>Slender.ttf</string>
+		<string>Slice And Dice.ttf</string>
+		<string>Smoke.ttf</string>
+		<string>Snappy Service.ttf</string>
+		<string>South Afirkas 2100.ttf</string>
+		<string>Soy Sauce Junky.ttf</string>
+		<string>Splendid Plan 9 Italic.ttf</string>
+		<string>Splendid Plan 9 Regular.ttf</string>
+		<string>Sports World.ttf</string>
+		<string>Spray.ME.ttf</string>
+		<string>Square Route.ttf</string>
+		<string>Square.ttf</string>
+		<string>Stab.ttf</string>
+		<string>Stage.ttf</string>
+		<string>Stencil Export.ttf</string>
+		<string>Still Time.ttf</string>
+		<string>Streetvertising Bold.ttf</string>
+		<string>Streetvertising Light.ttf</string>
+		<string>Streetvertising Medium.ttf</string>
+		<string>Subway Black.ttf</string>
+		<string>Subway Shadow.ttf</string>
+		<string>Subway.ttf</string>
+		<string>Sui Generis.ttf</string>
+		<string>Summertime Extra Characters.ttf</string>
+		<string>Summertime Extra Oblique.ttf</string>
+		<string>Summertime Oblique.ttf</string>
+		<string>Summertime.ttf</string>
+		<string>Sundayscript.ttf</string>
+		<string>Super Mario 256.ttf</string>
+		<string>Swish.ttf</string>
+		<string>Tagster.ttf</string>
+		<string>Takeout.ttf</string>
+		<string>Teutonic.ttf</string>
+		<string>Text In Gothic.ttf</string>
+		<string>The Soul Of Vodka.ttf</string>
+		<string>Three Sixty Condensed.ttf</string>
+		<string>Three Sixty.ttf</string>
+		<string>Timeless Bold.ttf</string>
+		<string>Timeless.ttf</string>
+		<string>Tintoretto.ttf</string>
+		<string>Titan One.ttf</string>
+		<string>To Be Continued.ttf</string>
+		<string>Tomipop.ttf</string>
+		<string>Tongkonan.ttf</string>
+		<string>Tork Bold Italic.ttf</string>
+		<string>Tork Bold.ttf</string>
+		<string>Tork Italic.ttf</string>
+		<string>Tork.ttf</string>
+		<string>Tulisan Tanganku.ttf</string>
+		<string>Turok.ttf</string>
+		<string>Type Wrong.ttf</string>
+		<string>Typewriter Oldstyle.ttf</string>
+		<string>Typo Latin Serif Bold.ttf</string>
+		<string>Typography Times Bold Italic.ttf</string>
+		<string>Typography Times Bold.ttf</string>
+		<string>Typography Times Italic.ttf</string>
+		<string>Typography Times Regular.ttf</string>
+		<string>Typomoderno.ttf</string>
+		<string>Tyro Sans.ttf</string>
+		<string>Uchiyama.ttf</string>
+		<string>UnZialish.ttf</string>
+		<string>Underwood Champion.ttf</string>
+		<string>Unik Type.ttf</string>
+		<string>Unispace Bold Italic.ttf</string>
+		<string>Unispace Bold.ttf</string>
+		<string>Unispace Italic.ttf</string>
+		<string>Unispace.ttf</string>
+		<string>Usenet Alternates.ttf</string>
+		<string>Usenet.ttf</string>
+		<string>Vahika Bold Italic.ttf</string>
+		<string>Vahika Bold.ttf</string>
+		<string>Vahika Italic.ttf</string>
+		<string>Vahika.ttf</string>
+		<string>Vanilla Whale.ttf</string>
+		<string>Vegas Desert.ttf</string>
+		<string>Velvet Illusions.ttf</string>
+		<string>Verve Alternate.ttf</string>
+		<string>Verve Shadow.ttf</string>
+		<string>Verve.ttf</string>
+		<string>Vibrocentric Bold Italic.ttf</string>
+		<string>Vibrocentric Bold.ttf</string>
+		<string>Vibrocentric Italic.ttf</string>
+		<string>Vibrocentric.ttf</string>
+		<string>Victor Hugo.ttf</string>
+		<string>Victoria CAT.ttf</string>
+		<string>Vinque.ttf</string>
+		<string>Visionaries 2.ttf</string>
+		<string>Visionaries.ttf</string>
+		<string>Vive la Rivoluzione.ttf</string>
+		<string>Walshes.ttf</string>
+		<string>Wartorn.ttf</string>
+		<string>Washington Text Alternates.ttf</string>
+		<string>Washington Text.ttf</string>
+		<string>Waterloo Relief.ttf</string>
+		<string>Whoa!.ttf</string>
+		<string>Wild Ride Backfill.ttf</string>
+		<string>Wild Ride.ttf</string>
+		<string>Wind Sans Serif.ttf</string>
+		<string>Winterland.ttf</string>
+		<string>Writers Bold.ttf</string>
+		<string>Writers Condensed.ttf</string>
+		<string>Writers Original.ttf</string>
+		<string>Xilosa.ttf</string>
+		<string>Xipital.ttf</string>
+		<string>Xirod.ttf</string>
+		<string>Xtra.ttf</string>
+		<string>Yaahowu Bold Italic.ttf</string>
+		<string>Yaahowu Bold.ttf</string>
+		<string>Yaahowu Italic.ttf</string>
+		<string>Yaahowu Light Italic.ttf</string>
+		<string>Yaahowu Light.ttf</string>
+		<string>Yaahowu Thick Italic.ttf</string>
+		<string>Yaahowu Thick.ttf</string>
+		<string>Yaahowu.ttf</string>
+		<string>Yanone Kaffeesatz Bold.ttf</string>
+		<string>Yanone Kaffeesatz Light.ttf</string>
+		<string>Yanone Kaffeesatz Regular.ttf</string>
+		<string>Yanone Kaffeesatz Thin.ttf</string>
+		<string>Ysgarth.ttf</string>
+		<string>akaPosse.ttf</string>
+		<string>el Diablo.ttf</string>
+	</array>
 </dict>
 </plist>
