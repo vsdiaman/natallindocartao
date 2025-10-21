@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "generate-fonts": "node ./generate-fonts.js",
+    "generate-fonts": "node scripts/generate-fonts.mjs --fonts-dir=assets/fonts --out=src/generated/fonts.ts",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "fonts:clean:dry": "node scripts/clean-fonts-by-ps.mjs --fonts-file=src/generated/fonts.ts --fonts-dir=assets/fonts --dry",
+    "fonts:clean:trash": "node scripts/clean-fonts-by-ps.mjs --fonts-file=src/generated/fonts.ts --fonts-dir=assets/fonts --trash",
+    "fonts:clean": "node scripts/clean-fonts-by-ps.mjs --fonts-file=src/generated/fonts.ts --fonts-dir=assets/fonts"
   },
   "dependencies": {
     "@react-native/new-app-screen": "0.82.0",
