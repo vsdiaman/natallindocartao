@@ -1,5 +1,5 @@
 // src/screens/EditorScreen.tsx
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,9 @@ import {
   ImageBackground,
   TouchableOpacity,
   Platform,
+  Share,
+  Alert,
+  PermissionsAndroid,
 } from 'react-native';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -21,6 +24,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import { RootStackParamList } from '../routes/Router';
 import FontPickerModal from '../components/FontPickerModal';
 import { AVAILABLE_FONTS, FontOption } from '../generated/fonts'; // Usando a lista gerada
+import ViewShot from 'react-native-view-shot';
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 type EditorRouteProp = RouteProp<RootStackParamList, 'Editor'>;
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
@@ -46,6 +51,7 @@ const QUICK_COLORS = [
 export default function EditorScreen({ route }: { route: EditorRouteProp }) {
   const navigation = useNavigation<NavProp>();
   const template = route?.params?.template;
+  const shotRef = useRef<ViewShot | null>(null);
 
   const [title, setTitle] = useState('Feliz Natal!');
   const [message, setMessage] = useState('Muita paz, saúde e alegria.');
@@ -90,18 +96,61 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
     try {
       setWorking(true);
       await task();
+    } catch (err) {
+      console.error(err);
+      const message =
+        err instanceof Error ? err.message : 'Tente novamente em instantes.';
+      Alert.alert('Ops!', message);
     } finally {
       setWorking(false);
     }
   }
+
+  async function ensureSavePermission() {
+    if (Platform.OS !== 'android') return true;
+
+    const needsReadMedia = (Platform.Version as number) >= 33;
+    const permission = needsReadMedia
+      ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+      : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+
+    const status = await PermissionsAndroid.request(permission, {
+      title: 'Permissão para salvar imagens',
+      message: 'Precisamos de acesso ao armazenamento para salvar seu cartão.',
+      buttonPositive: 'Permitir',
+      buttonNegative: 'Cancelar',
+    });
+
+    return status === PermissionsAndroid.RESULTS.GRANTED;
+  }
+
+  async function captureCard() {
+    await wait(100);
+    const uri = await shotRef.current?.capture?.();
+    if (!uri) throw new Error('Não foi possível gerar a imagem do cartão.');
+    return uri;
+  }
+
   function onSave() {
     withLoader(async () => {
-      /* persistir */ await wait(700);
+      const hasPermission = await ensureSavePermission();
+      if (!hasPermission)
+        throw new Error('Permissão negada para salvar o cartão.');
+
+      const uri = await captureCard();
+      await CameraRoll.save(uri, { type: 'photo' });
+      Alert.alert('Pronto!', 'Cartão salvo na galeria com sucesso.');
     });
   }
   function onShare() {
     withLoader(async () => {
-      /* gerar/compartilhar */ await wait(700);
+      const uri = await captureCard();
+
+      await Share.share({
+        url: uri,
+        message:
+          'Criei este cartão no app Natal Lindo Cartão. Compartilhe o seu também!',
+      });
     });
   }
 
@@ -167,59 +216,65 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
         ]}
       >
         {/* Preview */}
-        <LinearGradient colors={[RED, RED_DARK]} style={s.previewWrap}>
-          <ImageBackground
-            source={imgSource}
-            style={s.preview}
-            imageStyle={s.previewImage}
-            onLayout={e =>
-              setSize({
-                w: e.nativeEvent.layout.width,
-                h: e.nativeEvent.layout.height,
-              })
-            }
-          >
-            <View style={s.overlay} />
+        <ViewShot
+          ref={shotRef}
+          options={{ format: 'png', quality: 1 }}
+          style={{ borderRadius: 16, overflow: 'hidden' }}
+        >
+          <LinearGradient colors={[RED, RED_DARK]} style={s.previewWrap}>
+            <ImageBackground
+              source={imgSource}
+              style={s.preview}
+              imageStyle={s.previewImage}
+              onLayout={e =>
+                setSize({
+                  w: e.nativeEvent.layout.width,
+                  h: e.nativeEvent.layout.height,
+                })
+              }
+            >
+              <View style={s.overlay} />
 
-            {size.w > 0 && (
-              <>
-                <DraggableText
-                  key={`t-${size.w}`}
-                  initialX={titlePos.x}
-                  initialY={titlePos.y}
-                  style={[
-                    s.previewTitle,
-                    {
-                      color: titleColor,
-                      fontSize: titleSize,
-                      lineHeight: titleSize * 1.15,
-                      fontFamily: titleFont, // Aplica a fonte do título
-                    },
-                  ]}
-                >
-                  {title}
-                </DraggableText>
+              {size.w > 0 && (
+                <>
+                  <DraggableText
+                    key={`t-${size.w}`}
+                    initialX={titlePos.x}
+                    initialY={titlePos.y}
+                    style={[
+                      s.previewTitle,
+                      {
+                        color: titleColor,
+                        fontSize: titleSize,
+                        lineHeight: titleSize * 1.15,
+                        fontFamily: titleFont, // Aplica a fonte do título
+                      },
+                    ]}
+                  >
+                    {title}
+                  </DraggableText>
 
-                <DraggableText
-                  key={`m-${size.w}`}
-                  initialX={msgPos.x}
-                  initialY={msgPos.y}
-                  style={[
-                    s.previewMessage,
-                    {
-                      color: messageColor,
-                      fontSize: messageSize,
-                      lineHeight: messageSize * 1.2,
-                      fontFamily: messageFont, // Aplica a fonte da mensagem
-                    },
-                  ]}
-                >
-                  {message}
-                </DraggableText>
-              </>
-            )}
-          </ImageBackground>
-        </LinearGradient>
+                  <DraggableText
+                    key={`m-${size.w}`}
+                    initialX={msgPos.x}
+                    initialY={msgPos.y}
+                    style={[
+                      s.previewMessage,
+                      {
+                        color: messageColor,
+                        fontSize: messageSize,
+                        lineHeight: messageSize * 1.2,
+                        fontFamily: messageFont, // Aplica a fonte da mensagem
+                      },
+                    ]}
+                  >
+                    {message}
+                  </DraggableText>
+                </>
+              )}
+            </ImageBackground>
+          </LinearGradient>
+        </ViewShot>
 
         {/* Form UI */}
         <View style={s.panel}>
