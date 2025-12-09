@@ -109,10 +109,16 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
   async function ensureSavePermission() {
     if (Platform.OS !== 'android') return true;
 
-    const needsReadMedia = (Platform.Version as number) >= 33;
-    const permission = needsReadMedia
-      ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-      : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+    const sdk = Number(Platform.Version);
+    let permission: string;
+
+    if (sdk >= 33) {
+      permission = PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES;
+    } else if (sdk >= 29) {
+      permission = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+    } else {
+      permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+    }
 
     const status = await PermissionsAndroid.request(permission, {
       title: 'Permissão para salvar imagens',
@@ -120,6 +126,8 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
       buttonPositive: 'Permitir',
       buttonNegative: 'Cancelar',
     });
+
+    console.log('Permission status =>', status);
 
     return status === PermissionsAndroid.RESULTS.GRANTED;
   }
@@ -134,8 +142,16 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
   function onSave() {
     withLoader(async () => {
       const hasPermission = await ensureSavePermission();
-      if (!hasPermission)
-        throw new Error('Permissão negada para salvar o cartão.');
+
+      if (!hasPermission) {
+        // já pediu permissão e o usuário negou
+        // só avisa e sai, sem exception
+        Alert.alert(
+          'Ops!',
+          'Permissão negada. Vá em Configurações > Apps > Natal Lindo Cartão > Permissões e permita acesso a Fotos/Armazenamento.',
+        );
+        return;
+      }
 
       const uri = await captureCard();
       await CameraRoll.save(uri, { type: 'photo' });
