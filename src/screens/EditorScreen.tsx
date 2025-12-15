@@ -410,14 +410,14 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
                 <Text style={s.btnText}>Salvar</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               activeOpacity={0.9}
               onPress={onShare}
               disabled={working}
               style={[s.btnGhost, working && { opacity: 0.6 }]}
             >
               <Text style={s.btnGhostText}>Compartilhar</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </ScrollView>
