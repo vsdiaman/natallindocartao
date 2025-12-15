@@ -1,4 +1,4 @@
-package com.natallindocartao
+package br.com.huolong.natallindocartao
 
 import android.app.Application
 import com.facebook.react.PackageList

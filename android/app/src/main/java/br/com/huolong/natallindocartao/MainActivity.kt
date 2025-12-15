@@ -1,4 +1,4 @@
-package com.natallindocartao
+package br.com.huolong.natallindocartao
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
