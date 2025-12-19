@@ -22,6 +22,7 @@ import Loader from '../components/Loader';
 import { RootStackParamList } from '../routes/Router';
 
 const COLORS = {
+  // base
   bg: '#F5F6F8',
   text: '#111827',
   muted: '#6B7280',
@@ -29,6 +30,26 @@ const COLORS = {
   primary: '#141419',
   primaryText: '#FFFFFF',
   imageBg: '#EEF1F6',
+
+  // extras (15+)
+  red: '#EF4444',
+  redDark: '#B91C1C',
+  yellow: '#F59E0B',
+  yellowSoft: '#FDE68A',
+  blue: '#3B82F6',
+  blueDark: '#1D4ED8',
+  green: '#22C55E',
+  emerald: '#10B981',
+  beige: '#F5E6D3',
+  sand: '#E7D3B0',
+  brown: '#8B5E34',
+  brownDark: '#5A3E2B',
+  wine: '#7F1D1D',
+  purple: '#8B5CF6',
+  pink: '#EC4899',
+  cyan: '#06B6D4',
+  orange: '#F97316',
+  graySoft: '#F3F4F6',
 };
 
 const PAGE = 18;
@@ -201,7 +222,7 @@ const s = StyleSheet.create({
     position: 'relative',
   },
   thumbSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.red,
   },
   thumbImg: { width: '100%', height: '100%' },
 
@@ -232,7 +253,7 @@ const s = StyleSheet.create({
   cta: {
     height: 54,
     borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.redDark,
     alignItems: 'center',
     justifyContent: 'center',
   },

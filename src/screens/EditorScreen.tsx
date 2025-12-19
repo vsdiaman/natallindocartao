@@ -30,13 +30,34 @@ type EditorRouteProp = RouteProp<RootStackParamList, 'Editor'>;
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 const COLORS = {
+  // base
   bg: '#F5F6F8',
-  card: '#FFFFFF',
   text: '#111827',
   muted: '#6B7280',
   border: '#E5E7EB',
   primary: '#141419',
   primaryText: '#FFFFFF',
+  imageBg: '#EEF1F6',
+
+  // extras (15+)
+  red: '#EF4444',
+  redDark: '#B91C1C',
+  yellow: '#F59E0B',
+  yellowSoft: '#FDE68A',
+  blue: '#3B82F6',
+  blueDark: '#1D4ED8',
+  green: '#22C55E',
+  emerald: '#10B981',
+  beige: '#F5E6D3',
+  sand: '#E7D3B0',
+  brown: '#8B5E34',
+  brownDark: '#5A3E2B',
+  wine: '#7F1D1D',
+  purple: '#8B5CF6',
+  pink: '#EC4899',
+  cyan: '#06B6D4',
+  orange: '#F97316',
+  graySoft: '#F3F4F6',
 };
 
 const QUICK_COLORS = [
@@ -458,14 +479,14 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
           <Text style={s.actionGhostText}>Salvar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={0.9}
           onPress={onShare}
           disabled={working}
           style={[s.actionPrimary, working && { opacity: 0.6 }]}
         >
           <Text style={s.actionPrimaryText}>Compartilhar</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <FontPickerModal
@@ -684,13 +705,13 @@ const s = StyleSheet.create({
     flex: 1,
     height: 54,
     borderRadius: 16,
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.redDark,
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionGhostText: { color: COLORS.text, fontSize: 16, fontWeight: '900' },
+  actionGhostText: { color: COLORS.bg, fontSize: 16, fontWeight: '900' },
   actionPrimary: {
     flex: 1,
     height: 54,
