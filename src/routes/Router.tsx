@@ -1,13 +1,15 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import IntroScreen from '../screens/IntroScreen';
 import HomeScreen from '../screens/HomeScreen';
 import EditorScreen from '../screens/EditorScreen';
+import type { Template } from '../data/templates.local';
 
 export type RootStackParamList = {
   Intro: undefined;
   Home: undefined;
-  Editor: { template?: any } | undefined;
+  Editor: { template: Template };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

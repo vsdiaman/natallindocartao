@@ -1,140 +1,336 @@
 // src/screens/IntroScreen.tsx
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  FlatList,
   Animated,
-  Easing,
+  useWindowDimensions,
   Platform,
 } from 'react-native';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Loader from '../components/Loader';
 
-const RED = '#C00021';
-const RED_DARK = '#920018';
-const WHITE = '#FFFFFF';
+const COLORS = {
+  card: 'rgb(255,255,255)',
+  text: 'rgb(17,24,39)',
+  muted: 'rgb(107,114,128)',
+  border: 'rgb(229,231,235)',
+  primary: 'rgb(20,20,25)',
+  primaryText: 'rgb(255,255,255)',
+};
+
+type Step = {
+  title: string;
+  subtitle: string;
+  icon: string;
+};
+
+const STEPS: Step[] = [
+  {
+    title: 'Modelos prontos',
+    subtitle: 'Escolha um cartão e comece rápido, sem complicação.',
+    icon: '🎁',
+  },
+  {
+    title: 'Personalize',
+    subtitle: 'Edite texto, cor, fonte e arraste do seu jeito.',
+    icon: '✨',
+  },
+  {
+    title: 'Salve e compartilhe',
+    subtitle: 'Baixe em JPEG e compartilhe onde quiser.',
+    icon: '📤',
+  },
+];
 
 export default function IntroScreen() {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
 
-  const [working, setWorking] = useState(false);
-  const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
+  const listRef = useRef<FlatList<Step> | null>(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
 
-  const fade = useRef(new Animated.Value(0)).current;
-  const up = useRef(new Animated.Value(20)).current;
+  const [index, setIndex] = useState(0);
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fade, {
-        toValue: 1,
-        duration: 600,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }),
-      Animated.timing(up, {
-        toValue: 0,
-        duration: 600,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fade, up]);
+  const topInset = useMemo(() => {
+    const androidTop =
+      Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0;
+    return Math.max(insets.top, androidTop);
+  }, [insets.top]);
 
-  const onStart = async () => {
-    if (working) return;
-    setWorking(true);
-    try {
-      await wait(500); // mostra o loader um instante
-      navigation.replace('Home'); // some em fade (definido no Router)
-    } finally {
-      // a tela será desmontada após replace
+  const cardHeight = useMemo(() => {
+    // responsivo: não estoura em telas menores
+    const h = Math.round(height * 0.58);
+    return Math.max(420, Math.min(620, h));
+  }, [height]);
+
+  const goHome = useCallback(() => {
+    navigation.replace('Home');
+  }, [navigation]);
+
+  const goNext = useCallback(() => {
+    if (index >= STEPS.length - 1) {
+      goHome();
+      return;
     }
-  };
+    const next = index + 1;
+    listRef.current?.scrollToIndex({ index: next, animated: true });
+    setIndex(next);
+  }, [goHome, index]);
 
-  const topSafe = Math.max(
-    insets.top,
-    Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0,
+  const onMomentumEnd = useCallback(
+    (e: any) => {
+      const newIndex = Math.round(e.nativeEvent.contentOffset.x / width);
+      setIndex(Math.max(0, Math.min(STEPS.length - 1, newIndex)));
+    },
+    [width],
   );
-  const bottomSafe = insets.bottom;
+
+  const getItemLayout = useCallback(
+    (_: any, i: number) => ({ length: width, offset: width * i, index: i }),
+    [width],
+  );
+
+  // gradiente “anda” junto do swipe
+  const gradientTranslateX = Animated.multiply(scrollX, -1);
+
+  const renderItem = useCallback(
+    ({ item }: { item: Step }) => {
+      return (
+        <View style={[s.page, { width }]}>
+          <View style={[s.card, { height: cardHeight }]}>
+            <View style={s.illustration}>
+              <View style={s.illusCircle}>
+                <Text style={s.illusIcon}>{item.icon}</Text>
+              </View>
+
+              {/* “linhas”/desenho simples estilo onboarding */}
+              <View style={s.illusLines}>
+                <View style={[s.illusLine, { width: '78%' }]} />
+                <View style={[s.illusLine, { width: '64%' }]} />
+                <View style={[s.illusLine, { width: '70%' }]} />
+              </View>
+            </View>
+
+            <Text style={s.title}>{item.title}</Text>
+            <Text style={s.subtitle}>{item.subtitle}</Text>
+          </View>
+        </View>
+      );
+    },
+    [cardHeight, width],
+  );
+
+  const buttonText = index === STEPS.length - 1 ? 'Começar' : 'Próximo';
 
   return (
-    <SafeAreaView style={s.safe}>
+    <SafeAreaView style={s.safe} edges={['left', 'right', 'bottom']}>
       <StatusBar
         translucent
         backgroundColor="transparent"
-        barStyle="light-content"
+        barStyle="dark-content"
       />
-      <LinearGradient colors={[RED, RED_DARK]} style={s.bg}>
-        <View style={{ height: topSafe }} />
 
-        <Animated.View
-          style={[s.center, { opacity: fade, transform: [{ translateY: up }] }]}
-        >
-          <View style={s.logoWrap}>
-            <Text style={s.logoText}>🎄</Text>
-          </View>
-          <Text style={s.title}>Natal Lindo Cartão</Text>
-          <Text style={s.subtitle}>Crie cartões bonitos em segundos</Text>
-        </Animated.View>
+      {/* fundo */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          s.bg,
+          {
+            width: width * STEPS.length,
+            transform: [{ translateX: gradientTranslateX }],
+          },
+        ]}
+      >
+        <LinearGradient
+          // estilo da imagem: azul/roxo suave
+          colors={[
+            'rgb(164, 224, 255)',
+            'rgb(153, 201, 255)',
+            'rgb(154, 178, 255)',
+            'rgb(191, 170, 255)',
+          ]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={s.bgFill}
+        />
+      </Animated.View>
 
-        <View style={[s.footer, { paddingBottom: bottomSafe + 16 }]}>
-          <TouchableOpacity
-            activeOpacity={0.92}
-            onPress={onStart}
-            disabled={working}
-            style={[s.cta, working && { opacity: 0.6 }]}
-          >
-            <Text style={s.ctaText}>Começar</Text>
-          </TouchableOpacity>
+      {/* header */}
+      <View style={[s.header, { paddingTop: topInset + 10 }]}>
+        <View style={{ width: 64 }} />
+        <Text style={s.brand}>Natal Lindo Cartão</Text>
+        <TouchableOpacity onPress={goHome} hitSlop={10} style={s.skipBtn}>
+          <Text style={s.skip}>Pular</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* pages */}
+      <Animated.FlatList
+        ref={r => (listRef.current = r)}
+        data={STEPS}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={onMomentumEnd}
+        getItemLayout={getItemLayout}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: true },
+        )}
+        scrollEventThrottle={16}
+      />
+
+      {/* footer */}
+      <View style={[s.footer, { paddingBottom: insets.bottom + 16 }]}>
+        <View style={s.dots}>
+          {STEPS.map((_, i) => (
+            <View key={String(i)} style={[s.dot, i === index && s.dotActive]} />
+          ))}
         </View>
-      </LinearGradient>
 
-      <Loader visible={working} text="Carregando..." />
+        <TouchableOpacity activeOpacity={0.92} onPress={goNext} style={s.cta}>
+          <Text style={s.ctaText}>{buttonText}</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#000' },
-  bg: { flex: 1 },
-  center: {
+  safe: { flex: 1, backgroundColor: 'rgb(245,246,248)' },
+  bg: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+  },
+  bgFill: { flex: 1 },
+
+  header: {
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  brand: { color: COLORS.text, fontSize: 16, fontWeight: '900' },
+  skipBtn: { width: 64, alignItems: 'flex-end' },
+  skip: { color: COLORS.muted, fontSize: 14, fontWeight: '800' },
+
+  page: {
     flex: 1,
+    paddingHorizontal: 22,
+    paddingTop: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
   },
-  logoWrap: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+
+  card: {
+    width: '100%',
+    borderRadius: 26,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
+  },
+
+  illustration: {
+    height: 320,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: 'rgb(250,251,252)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    overflow: 'hidden',
   },
-  logoText: { fontSize: 42, color: WHITE },
-  title: { color: WHITE, fontSize: 24, fontWeight: '900', textAlign: 'center' },
-  subtitle: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 14,
-    marginTop: 6,
+
+  illusCircle: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgb(238, 241, 246)',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  illusIcon: { fontSize: 44 },
+
+  illusLines: { marginTop: 18, alignItems: 'center', gap: 10 },
+  illusLine: {
+    height: 12,
+    borderRadius: 10,
+    backgroundColor: 'rgb(238, 241, 246)',
+  },
+
+  title: {
+    marginTop: 16,
+    color: COLORS.text,
+    fontSize: 22,
+    fontWeight: '900',
     textAlign: 'center',
   },
-  footer: { alignItems: 'center', paddingHorizontal: 24 },
+  subtitle: {
+    marginTop: 8,
+    color: COLORS.muted,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '600',
+    textAlign: 'center',
+    paddingHorizontal: 10,
+  },
+
+  footer: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+  dots: {
+    height: 26,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 14,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+  },
+  dotActive: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.primary,
+  },
+
   cta: {
-    backgroundColor: WHITE,
-    height: 48,
-    borderRadius: 28,
-    paddingHorizontal: 28,
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaText: { color: '#B0001C', fontSize: 16, fontWeight: '800' },
+  ctaText: { color: COLORS.primaryText, fontSize: 16, fontWeight: '900' },
 });

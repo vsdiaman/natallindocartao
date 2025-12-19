@@ -1,5 +1,4 @@
-// src/screens/EditorScreen.tsx
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -18,23 +17,27 @@ import {
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Loader from '../components/Loader';
-import DraggableText from '../components/DraggableText';
-import LinearGradient from 'react-native-linear-gradient';
-import { RootStackParamList } from '../routes/Router';
-import FontPickerModal from '../components/FontPickerModal';
-import { AVAILABLE_FONTS, FontOption } from '../generated/fonts'; // Usando a lista gerada
 import ViewShot from 'react-native-view-shot';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+
+import Loader from '../components/Loader';
+import DraggableText from '../components/DraggableText';
+import FontPickerModal from '../components/FontPickerModal';
+import { AVAILABLE_FONTS, FontOption } from '../generated/fonts';
+import { RootStackParamList } from '../routes/Router';
 
 type EditorRouteProp = RouteProp<RootStackParamList, 'Editor'>;
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
-const RED = '#C00021',
-  RED_DARK = '#920018',
-  WHITE = '#FFFFFF';
-const GRAY_BORDER = '#E5E7EB',
-  GRAY_TEXT = '#6B7280';
+const COLORS = {
+  bg: '#F5F6F8',
+  card: '#FFFFFF',
+  text: '#111827',
+  muted: '#6B7280',
+  border: '#E5E7EB',
+  primary: '#141419',
+  primaryText: '#FFFFFF',
+};
 
 const QUICK_COLORS = [
   '#FFFFFF',
@@ -50,6 +53,8 @@ const QUICK_COLORS = [
 
 export default function EditorScreen({ route }: { route: EditorRouteProp }) {
   const navigation = useNavigation<NavProp>();
+  const insets = useSafeAreaInsets();
+
   const template = route?.params?.template;
   const shotRef = useRef<ViewShot | null>(null);
 
@@ -60,16 +65,14 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
   const [activeTarget, setActiveTarget] = useState<'title' | 'message'>(
     'title',
   );
-  const [titleColor, setTitleColor] = useState<string>(WHITE);
-  const [messageColor, setMessageColor] = useState<string>(WHITE);
+  const [titleColor, setTitleColor] = useState<string>('#FFFFFF');
+  const [messageColor, setMessageColor] = useState<string>('#FFFFFF');
 
-  const TITLE_SIZE_DEFAULT = 28;
-  const MESSAGE_SIZE_DEFAULT = 16;
   const MIN_SIZE = 10;
   const MAX_SIZE = 64;
 
-  const [titleSize, setTitleSize] = useState<number>(TITLE_SIZE_DEFAULT);
-  const [messageSize, setMessageSize] = useState<number>(MESSAGE_SIZE_DEFAULT);
+  const [titleSize, setTitleSize] = useState<number>(28);
+  const [messageSize, setMessageSize] = useState<number>(16);
 
   const [titleFont, setTitleFont] = useState<string>(
     AVAILABLE_FONTS[0].postscriptName,
@@ -78,47 +81,95 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
     AVAILABLE_FONTS[0].postscriptName,
   );
 
-  // --- MODIFICADO: Estado para controlar o modal de fontes ---
   const [isFontModalVisible, setFontModalVisible] = useState(false);
 
-  const selectedSize = activeTarget === 'title' ? titleSize : messageSize;
-  function setSelectedSize(v: number) {
-    const clamped = Math.max(MIN_SIZE, Math.min(MAX_SIZE, v));
-    if (activeTarget === 'title') setTitleSize(clamped);
-    else setMessageSize(clamped);
-  }
-  const incSize = () => setSelectedSize(selectedSize + 2);
-  const decSize = () => setSelectedSize(selectedSize - 2);
-
   const [working, setWorking] = useState(false);
+
+  const topSafe = useMemo(() => {
+    const androidTop =
+      Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0;
+    return Math.max(insets.top, androidTop);
+  }, [insets.top]);
+
+  const imgSource = useMemo(() => {
+    if (!template?.image) return undefined;
+    return typeof template.image === 'string'
+      ? { uri: template.image }
+      : template.image;
+  }, [template?.image]);
+
+  const titlePos = useMemo(
+    () => ({ x: size.w * 0.5 - 100, y: size.h * 0.15 }),
+    [size.h, size.w],
+  );
+  const msgPos = useMemo(
+    () => ({ x: size.w * 0.5 - 130, y: size.h * 0.3 }),
+    [size.h, size.w],
+  );
+
+  const selectedSize = activeTarget === 'title' ? titleSize : messageSize;
+  const selectedColor = activeTarget === 'title' ? titleColor : messageColor;
+  const selectedFont = activeTarget === 'title' ? titleFont : messageFont;
+
+  const selectedFontName = useMemo(() => {
+    return (
+      AVAILABLE_FONTS.find(f => f.postscriptName === selectedFont)?.name ??
+      'Padrão'
+    );
+  }, [selectedFont]);
+
+  const setSelectedSize = useCallback(
+    (value: number) => {
+      const clamped = Math.max(MIN_SIZE, Math.min(MAX_SIZE, value));
+      if (activeTarget === 'title') setTitleSize(clamped);
+      else setMessageSize(clamped);
+    },
+    [activeTarget],
+  );
+
+  const applyQuickColor = useCallback(
+    (color: string) => {
+      if (activeTarget === 'title') setTitleColor(color);
+      else setMessageColor(color);
+    },
+    [activeTarget],
+  );
+
+  const applyFont = useCallback(
+    (font: FontOption) => {
+      if (activeTarget === 'title') setTitleFont(font.postscriptName);
+      else setMessageFont(font.postscriptName);
+      setFontModalVisible(false);
+    },
+    [activeTarget],
+  );
+
   const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
-  async function withLoader(task: () => Promise<void>) {
+
+  const withLoader = useCallback(async (task: () => Promise<void>) => {
     try {
       setWorking(true);
       await task();
     } catch (err) {
       console.error(err);
-      const message =
-        err instanceof Error ? err.message : 'Tente novamente em instantes.';
-      Alert.alert('Ops!', message);
+      const msg = err instanceof Error ? err.message : 'Tente novamente.';
+      Alert.alert('Ops!', msg);
     } finally {
       setWorking(false);
     }
-  }
+  }, []);
 
-  async function ensureSavePermission() {
+  const ensureSavePermission = useCallback(async () => {
     if (Platform.OS !== 'android') return true;
 
     const sdk = Number(Platform.Version);
     let permission: string;
 
-    if (sdk >= 33) {
+    if (sdk >= 33)
       permission = PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES;
-    } else if (sdk >= 29) {
+    else if (sdk >= 29)
       permission = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
-    } else {
-      permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
-    }
+    else permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
 
     const status = await PermissionsAndroid.request(permission, {
       title: 'Permissão para salvar imagens',
@@ -127,180 +178,172 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
       buttonNegative: 'Cancelar',
     });
 
-    console.log('Permission status =>', status);
-
     return status === PermissionsAndroid.RESULTS.GRANTED;
-  }
+  }, []);
 
-  async function captureCard() {
-    await wait(100);
+  const captureCard = useCallback(async () => {
+    await wait(80);
     const uri = await shotRef.current?.capture?.();
     if (!uri) throw new Error('Não foi possível gerar a imagem do cartão.');
     return uri;
-  }
+  }, []);
 
-  function onSave() {
+  const onSave = useCallback(() => {
     withLoader(async () => {
       const hasPermission = await ensureSavePermission();
-
       if (!hasPermission) {
-        // já pediu permissão e o usuário negou
-        // só avisa e sai, sem exception
         Alert.alert(
           'Ops!',
           'Permissão negada. Vá em Configurações > Apps > Natal Lindo Cartão > Permissões e permita acesso a Fotos/Armazenamento.',
         );
         return;
       }
-
       const uri = await captureCard();
       await CameraRoll.save(uri, { type: 'photo' });
       Alert.alert('Pronto!', 'Cartão salvo na galeria com sucesso.');
     });
-  }
-  function onShare() {
+  }, [captureCard, ensureSavePermission, withLoader]);
+
+  const onShare = useCallback(() => {
     withLoader(async () => {
       const uri = await captureCard();
-
       await Share.share({
         url: uri,
         message:
           'Criei este cartão no app Natal Lindo Cartão. Compartilhe o seu também!',
       });
     });
+  }, [captureCard, withLoader]);
+
+  if (!template) {
+    return (
+      <SafeAreaView
+        style={[s.safe, { alignItems: 'center', justifyContent: 'center' }]}
+      >
+        <Text style={{ color: COLORS.text, fontWeight: '800' }}>
+          Template inválido.
+        </Text>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ marginTop: 12 }}
+        >
+          <Text style={{ color: COLORS.muted, fontWeight: '700' }}>Voltar</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
   }
-
-  const imgSource =
-    typeof template?.image === 'string'
-      ? { uri: template.image }
-      : template?.image;
-
-  const titlePos = { x: size.w * 0.5 - 100, y: size.h * 0.15 };
-  const msgPos = { x: size.w * 0.5 - 130, y: size.h * 0.3 };
-
-  function applyQuickColor(color: string) {
-    if (activeTarget === 'title') setTitleColor(color);
-    else setMessageColor(color);
-  }
-  const selectedColor = activeTarget === 'title' ? titleColor : messageColor;
-
-  // --- MODIFICADO: Lógica para aplicar a fonte vinda do modal ---
-  const selectedFont = activeTarget === 'title' ? titleFont : messageFont;
-  function applyFont(font: FontOption) {
-    if (activeTarget === 'title') {
-      setTitleFont(font.postscriptName);
-    } else {
-      setMessageFont(font.postscriptName);
-    }
-    setFontModalVisible(false); // Fecha o modal
-  }
-  // Pega o nome amigável da fonte para exibir no botão
-  const selectedFontName =
-    AVAILABLE_FONTS.find(f => f.postscriptName === selectedFont)?.name ||
-    'Padrão';
-
-  const insets = useSafeAreaInsets();
-  const topSafe = Math.max(
-    insets.top,
-    Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0,
-  );
 
   return (
     <SafeAreaView style={s.safe}>
-      <StatusBar
-        barStyle="light-content"
-        translucent
-        backgroundColor="transparent"
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
 
       {/* Header */}
       <View style={[s.header, { paddingTop: topSafe + 8 }]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          activeOpacity={0.9}
+          style={s.backBtn}
         >
-          <Text style={s.back}>{'←'}</Text>
+          <Text style={s.backText}>←</Text>
         </TouchableOpacity>
-        <Text style={s.headerTitle}>Editar Cartão</Text>
-        <View style={{ width: 24 }} />
+
+        <Text style={s.headerTitle}>Editor</Text>
+        <View style={{ width: 44 }} />
       </View>
 
       <ScrollView
-        contentContainerStyle={[
-          s.scroll,
-          { paddingBottom: insets.bottom + 12 },
-        ]}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          padding: 16,
+          paddingBottom: insets.bottom + 130,
+        }}
       >
         {/* Preview */}
-        <ViewShot
-          ref={shotRef}
-          options={{ format: 'png', quality: 1 }}
-          style={{ borderRadius: 16, overflow: 'hidden' }}
-        >
-          <LinearGradient colors={[RED, RED_DARK]} style={s.previewWrap}>
-            <ImageBackground
-              source={imgSource}
-              style={s.preview}
-              imageStyle={s.previewImage}
-              onLayout={e =>
-                setSize({
-                  w: e.nativeEvent.layout.width,
-                  h: e.nativeEvent.layout.height,
-                })
-              }
-            >
-              <View style={s.overlay} />
+        <ViewShot ref={shotRef} options={{ format: 'png', quality: 1 }}>
+          <ImageBackground
+            source={imgSource}
+            style={s.preview}
+            imageStyle={s.previewImage}
+            onLayout={e =>
+              setSize({
+                w: e.nativeEvent.layout.width,
+                h: e.nativeEvent.layout.height,
+              })
+            }
+          >
+            <View style={s.overlay} />
 
-              {size.w > 0 && (
-                <>
-                  <DraggableText
-                    key={`t-${size.w}`}
-                    initialX={titlePos.x}
-                    initialY={titlePos.y}
-                    style={[
-                      s.previewTitle,
-                      {
-                        color: titleColor,
-                        fontSize: titleSize,
-                        lineHeight: titleSize * 1.15,
-                        fontFamily: titleFont, // Aplica a fonte do título
-                      },
-                    ]}
-                  >
-                    {title}
-                  </DraggableText>
+            {size.w > 0 && (
+              <>
+                <DraggableText
+                  key={`t-${size.w}`}
+                  initialX={titlePos.x}
+                  initialY={titlePos.y}
+                  style={[
+                    s.previewTitle,
+                    {
+                      color: titleColor,
+                      fontSize: titleSize,
+                      lineHeight: titleSize * 1.15,
+                      fontFamily: titleFont,
+                    },
+                  ]}
+                >
+                  {title}
+                </DraggableText>
 
-                  <DraggableText
-                    key={`m-${size.w}`}
-                    initialX={msgPos.x}
-                    initialY={msgPos.y}
-                    style={[
-                      s.previewMessage,
-                      {
-                        color: messageColor,
-                        fontSize: messageSize,
-                        lineHeight: messageSize * 1.2,
-                        fontFamily: messageFont, // Aplica a fonte da mensagem
-                      },
-                    ]}
-                  >
-                    {message}
-                  </DraggableText>
-                </>
-              )}
-            </ImageBackground>
-          </LinearGradient>
+                <DraggableText
+                  key={`m-${size.w}`}
+                  initialX={msgPos.x}
+                  initialY={msgPos.y}
+                  style={[
+                    s.previewMessage,
+                    {
+                      color: messageColor,
+                      fontSize: messageSize,
+                      lineHeight: messageSize * 1.2,
+                      fontFamily: messageFont,
+                    },
+                  ]}
+                >
+                  {message}
+                </DraggableText>
+              </>
+            )}
+          </ImageBackground>
         </ViewShot>
 
-        {/* Form UI */}
+        {/* Ferramentas (visual) */}
+        <View style={s.toolsCard}>
+          <Text style={s.sectionTitle}>Ferramentas</Text>
+          <View style={s.toolsRow}>
+            <View style={s.tool}>
+              <Text style={s.toolIcon}>T</Text>
+              <Text style={s.toolText}>Texto</Text>
+            </View>
+            <View style={s.tool}>
+              <Text style={s.toolIcon}>☺</Text>
+              <Text style={s.toolText}>Figurinhas</Text>
+            </View>
+            <View style={s.tool}>
+              <Text style={s.toolIcon}>▢</Text>
+              <Text style={s.toolText}>Molduras</Text>
+            </View>
+            <View style={s.tool}>
+              <Text style={s.toolIcon}>◼</Text>
+              <Text style={s.toolText}>Fundo</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Form */}
         <View style={s.panel}>
-          {/* ... Título, Mensagem, Segmento ... */}
           <Text style={s.label}>Título</Text>
           <TextInput
             value={title}
             onChangeText={setTitle}
             placeholder="Ex.: Feliz Natal!"
-            placeholderTextColor={GRAY_TEXT}
+            placeholderTextColor={COLORS.muted}
             style={s.input}
           />
 
@@ -309,7 +352,7 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
             value={message}
             onChangeText={setMessage}
             placeholder="Escreva sua mensagem"
-            placeholderTextColor={GRAY_TEXT}
+            placeholderTextColor={COLORS.muted}
             style={[s.input, { height: 96 }]}
             multiline
           />
@@ -318,6 +361,7 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
             <TouchableOpacity
               onPress={() => setActiveTarget('title')}
               style={[s.segment, activeTarget === 'title' && s.segmentActive]}
+              activeOpacity={0.9}
             >
               <Text
                 style={[
@@ -332,6 +376,7 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
             <TouchableOpacity
               onPress={() => setActiveTarget('message')}
               style={[s.segment, activeTarget === 'message' && s.segmentActive]}
+              activeOpacity={0.9}
             >
               <Text
                 style={[
@@ -344,7 +389,6 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
             </TouchableOpacity>
           </View>
 
-          {/* Paleta rápida */}
           <Text style={s.label}>Cores rápidas</Text>
           <View style={s.colorsRow}>
             {QUICK_COLORS.map(color => {
@@ -365,64 +409,65 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
             })}
           </View>
 
-          {/* --- MODIFICADO: Botão para abrir o modal de fontes --- */}
           <Text style={s.label}>Fonte</Text>
           <TouchableOpacity
             style={s.fontPickerButton}
             onPress={() => setFontModalVisible(true)}
+            activeOpacity={0.9}
           >
             <Text
               style={[s.fontPickerButtonText, { fontFamily: selectedFont }]}
+              numberOfLines={1}
             >
               {selectedFontName}
             </Text>
             <Text style={s.fontPickerButtonChevron}>▼</Text>
           </TouchableOpacity>
 
-          {/* Tamanho */}
           <Text style={s.label}>Tamanho</Text>
           <View style={s.sizeRow}>
             <TouchableOpacity
-              onPress={decSize}
+              onPress={() => setSelectedSize(selectedSize - 2)}
               style={s.sizeBtn}
               activeOpacity={0.9}
             >
               <Text style={s.sizeBtnText}>A-</Text>
             </TouchableOpacity>
+
             <Text style={s.sizeValue}>{Math.round(selectedSize)}</Text>
+
             <TouchableOpacity
-              onPress={incSize}
+              onPress={() => setSelectedSize(selectedSize + 2)}
               style={s.sizeBtn}
               activeOpacity={0.9}
             >
               <Text style={s.sizeBtnText}>A+</Text>
             </TouchableOpacity>
           </View>
-
-          <View style={s.actions}>
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={onSave}
-              disabled={working}
-              style={[s.btn, working && { opacity: 0.6 }]}
-            >
-              <LinearGradient colors={[RED, RED_DARK]} style={s.btnInner}>
-                <Text style={s.btnText}>Salvar</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            {/* <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={onShare}
-              disabled={working}
-              style={[s.btnGhost, working && { opacity: 0.6 }]}
-            >
-              <Text style={s.btnGhostText}>Compartilhar</Text>
-            </TouchableOpacity> */}
-          </View>
         </View>
       </ScrollView>
 
-      {/* --- ADICIONADO: Renderiza o Modal --- */}
+      {/* Bottom actions */}
+      <View style={[s.bottomBar, { paddingBottom: insets.bottom + 16 }]}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={onSave}
+          disabled={working}
+          style={[s.actionGhost, working && { opacity: 0.6 }]}
+        >
+          <Text style={s.actionGhostText}>Salvar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={onShare}
+          disabled={working}
+          style={[s.actionPrimary, working && { opacity: 0.6 }]}
+        >
+          <Text style={s.actionPrimaryText}>Compartilhar</Text>
+        </TouchableOpacity>
+      </View>
+
       <FontPickerModal
         visible={isFontModalVisible}
         fonts={AVAILABLE_FONTS}
@@ -437,29 +482,42 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
 }
 
 const s = StyleSheet.create({
-  // ... (Todos os seus estilos existentes, como safe, header, etc.)
-  safe: { flex: 1, backgroundColor: WHITE },
+  safe: { flex: 1, backgroundColor: COLORS.bg },
+
   header: {
     paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: RED,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: RED_DARK,
   },
-  back: { color: WHITE, fontSize: 20, width: 24, textAlign: 'left' },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backText: { color: COLORS.text, fontSize: 20, fontWeight: '900' },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
-    color: WHITE,
-    fontSize: 20,
-    fontWeight: '700',
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '900',
   },
-  scroll: { padding: 16 },
-  previewWrap: { borderRadius: 16, padding: 8 },
-  preview: { aspectRatio: 3 / 4, borderRadius: 12, overflow: 'hidden' },
-  previewImage: { resizeMode: 'cover', borderRadius: 12 },
+
+  previewCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 12,
+  },
+  preview: { aspectRatio: 3 / 4 },
+  previewImage: { resizeMode: 'cover' },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.25)',
@@ -467,39 +525,78 @@ const s = StyleSheet.create({
   previewTitle: { textAlign: 'center' },
   previewMessage: { textAlign: 'center' },
 
-  panel: {
-    marginTop: 16,
-    backgroundColor: WHITE,
-    borderRadius: 12,
-    padding: 16,
+  toolsCard: {
+    marginTop: 12,
+    backgroundColor: COLORS.card,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: GRAY_BORDER,
+    borderColor: COLORS.border,
+    padding: 14,
   },
-  label: { color: RED, marginBottom: 6, fontSize: 12, fontWeight: '700' },
-  input: {
-    backgroundColor: '#fff',
+  sectionTitle: { color: COLORS.text, fontSize: 14, fontWeight: '900' },
+  toolsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  tool: {
+    width: '23%',
+    height: 86,
+    borderRadius: 18,
+    backgroundColor: '#EEF1F6',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: GRAY_BORDER,
-    color: '#111827',
-    borderRadius: 10,
+    borderColor: COLORS.border,
+  },
+  toolIcon: { color: COLORS.text, fontSize: 22, fontWeight: '900' },
+  toolText: {
+    color: COLORS.muted,
+    fontSize: 12,
+    fontWeight: '800',
+    marginTop: 6,
+  },
+
+  panel: {
+    marginTop: 12,
+    backgroundColor: COLORS.card,
+    borderRadius: 22,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  label: {
+    color: COLORS.text,
+    marginBottom: 6,
+    fontSize: 12,
+    fontWeight: '900',
+  },
+
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    color: COLORS.text,
+    borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 12,
   },
-  targetRow: { flexDirection: 'row', gap: 8, marginTop: 4, marginBottom: 10 },
+
+  targetRow: { flexDirection: 'row', gap: 10, marginTop: 2, marginBottom: 12 },
   segment: {
     flex: 1,
-    height: 36,
-    borderRadius: 10,
+    height: 40,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: GRAY_BORDER,
+    borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
   },
-  segmentActive: { borderColor: RED, backgroundColor: '#FFE5EA' },
-  segmentText: { color: '#111827', fontSize: 12, fontWeight: '700' },
-  segmentTextActive: { color: RED },
+  segmentActive: { borderColor: COLORS.primary, backgroundColor: '#EEF1F6' },
+  segmentText: { color: COLORS.text, fontSize: 12, fontWeight: '900' },
+  segmentTextActive: { color: COLORS.primary },
 
   colorsRow: {
     flexDirection: 'row',
@@ -512,78 +609,99 @@ const s = StyleSheet.create({
     height: 28,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: GRAY_BORDER,
+    borderColor: COLORS.border,
   },
   colorDotSelected: {
     borderWidth: 2,
-    borderColor: RED,
+    borderColor: COLORS.primary,
     transform: [{ scale: 1.05 }],
   },
 
-  // --- MODIFICADO: Estilos para o novo botão de fonte ---
   fontPickerButton: {
     height: 48,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: GRAY_BORDER,
-    borderRadius: 10,
+    borderColor: COLORS.border,
+    borderRadius: 14,
     paddingHorizontal: 12,
     marginBottom: 12,
+    backgroundColor: '#FFFFFF',
   },
   fontPickerButtonText: {
-    fontSize: 18,
-    color: '#111827',
+    fontSize: 16,
+    color: COLORS.text,
+    fontWeight: '800',
+    flex: 1,
+    paddingRight: 10,
   },
   fontPickerButtonChevron: {
     fontSize: 12,
-    color: GRAY_TEXT,
+    color: COLORS.muted,
+    fontWeight: '900',
   },
 
-  // tamanho
   sizeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginBottom: 12,
+    marginBottom: 4,
   },
   sizeBtn: {
-    height: 36,
+    height: 40,
     paddingHorizontal: 14,
-    borderRadius: 10,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: GRAY_BORDER,
+    borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
   },
-  sizeBtnText: { color: '#111827', fontSize: 14, fontWeight: '800' },
+  sizeBtnText: { color: COLORS.text, fontSize: 14, fontWeight: '900' },
   sizeValue: {
     minWidth: 36,
     textAlign: 'center',
-    color: '#111827',
+    color: COLORS.text,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '900',
   },
 
-  actions: { flexDirection: 'row', gap: 12, marginTop: 8 },
-  btn: { flex: 1 },
-  btnInner: {
-    height: 48,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  btnText: { color: WHITE, fontSize: 16, fontWeight: '800' },
-  btnGhost: {
-    height: 48,
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
     paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: RED,
+    paddingTop: 10,
+    flexDirection: 'row',
+    gap: 12,
+    backgroundColor: COLORS.bg,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  actionGhost: {
+    flex: 1,
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  btnGhostText: { color: RED, fontSize: 16, fontWeight: '800' },
+  actionGhostText: { color: COLORS.text, fontSize: 16, fontWeight: '900' },
+  actionPrimary: {
+    flex: 1,
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionPrimaryText: {
+    color: COLORS.primaryText,
+    fontSize: 16,
+    fontWeight: '900',
+  },
 });

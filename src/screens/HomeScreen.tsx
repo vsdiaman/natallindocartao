@@ -1,198 +1,241 @@
 // src/screens/HomeScreen.tsx
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   FlatList,
-  Platform,
+  useWindowDimensions,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { TEMPLATES, Template } from '../data/templates.local';
 import Loader from '../components/Loader';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../routes/Router';
 
-const RED = '#C00021';
-const RED_DARK = '#920018';
-const WHITE = '#FFFFFF';
-const PAGE = 12;
+const COLORS = {
+  bg: '#F5F6F8',
+  text: '#111827',
+  muted: '#6B7280',
+  border: '#E5E7EB',
+  primary: '#141419',
+  primaryText: '#FFFFFF',
+  imageBg: '#EEF1F6',
+};
+
+const PAGE = 18;
 
 export default function HomeScreen() {
   const { navigate } =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
 
   const [items, setItems] = useState<Template[]>(TEMPLATES.slice(0, PAGE));
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [opening, setOpening] = useState(false);
 
-  // loaders
-  const [opening, setOpening] = useState(false); // overlay ao abrir editor
-  const [loadingMore, setLoadingMore] = useState(false); // rodapé da lista
+  const selectedTemplate = useMemo(() => {
+    if (!selectedId) return null;
+    return (
+      items.find(t => t.id === selectedId) ??
+      TEMPLATES.find(t => t.id === selectedId) ??
+      null
+    );
+  }, [items, selectedId]);
 
-  const selectedTemplate = useMemo(
-    () =>
-      selectedId
-        ? items.find(t => t.id === selectedId) ??
-          TEMPLATES.find(t => t.id === selectedId)
-        : null,
-    [items, selectedId],
-  );
+  const gap = 12;
+  const contentPadding = 16;
+
+  const cardSize = useMemo(() => {
+    const available = width - contentPadding * 2 - gap * 2;
+    return Math.floor(available / 3);
+  }, [width]);
+
+  const topSafe = useMemo(() => {
+    const androidTop = StatusBar.currentHeight ?? 0;
+    return Math.max(insets.top, androidTop);
+  }, [insets.top]);
 
   const loadMore = useCallback(() => {
     if (loadingMore) return;
+
     const next = items.length;
-    if (next < TEMPLATES.length) {
-      setLoadingMore(true);
-      // se fosse API, faria await aqui; como é local, só marca e atualiza
+    if (next >= TEMPLATES.length) return;
+
+    setLoadingMore(true);
+    setTimeout(() => {
       setItems(prev => [...prev, ...TEMPLATES.slice(next, next + PAGE)]);
       setLoadingMore(false);
-    }
+    }, 180);
   }, [items.length, loadingMore]);
 
   const goEditor = useCallback(() => {
     if (!selectedTemplate) return;
+
     setOpening(true);
-    // se houver preparação assíncrona, faça-a aqui e só depois navegue
-    navigate('Editor', { template: selectedTemplate });
-    setOpening(false);
+    setTimeout(() => {
+      navigate('Editor', { template: selectedTemplate });
+      setOpening(false);
+    }, 80);
   }, [navigate, selectedTemplate]);
 
-  const topSafe = Math.max(
-    insets.top,
-    Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0,
+  const renderItem = useCallback(
+    ({ item }: { item: Template }) => {
+      const selected = item.id === selectedId;
+
+      return (
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => setSelectedId(item.id)}
+          style={[
+            s.thumb,
+            { width: cardSize, height: cardSize },
+            selected && s.thumbSelected,
+          ]}
+        >
+          <Image
+            source={item.image}
+            style={s.thumbImg}
+            resizeMode="cover" // se não quiser cortar, troca para "contain"
+          />
+
+          {selected && (
+            <View style={s.check}>
+              <Text style={s.checkText}>✓</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      );
+    },
+    [cardSize, selectedId],
   );
 
-  const renderItem = ({ item }: { item: Template }) => {
-    const selected = item.id === selectedId;
-    return (
-      <TouchableOpacity
-        onPress={() => setSelectedId(item.id)}
-        activeOpacity={0.9}
-        style={[s.card, selected && s.cardSelected]}
-      >
-        <Image source={item.image} style={s.cardImg} />
-        <View style={s.cardFooter}>
-          <Text style={s.cardTitle}>{item.title}</Text>
-        </View>
-        {selected && (
-          <View style={s.check}>
-            <Text style={s.checkText}>✓</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    );
-  };
-
   return (
-    <SafeAreaView style={s.safe}>
-      <StatusBar
-        barStyle="light-content"
-        translucent
-        backgroundColor="transparent"
-      />
-      <LinearGradient
-        colors={[RED, RED_DARK]}
-        style={[s.header, { paddingTop: topSafe + 12 }]}
-      >
-        <Text style={s.appTitle}>Natal Lindo Cartão</Text>
-        <TouchableOpacity
-          onPress={goEditor}
-          disabled={!selectedTemplate}
-          activeOpacity={0.9}
-          style={[s.cta, !selectedTemplate && s.ctaDisabled]}
-        >
-          <Text style={s.ctaText}>Começar a Criar</Text>
-        </TouchableOpacity>
-      </LinearGradient>
+    <SafeAreaView style={s.safe} edges={['left', 'right', 'bottom']}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
 
-      <View style={s.body}>
-        <FlatList
-          data={items}
-          keyExtractor={it => String(it.id)}
-          numColumns={2}
-          renderItem={renderItem}
-          columnWrapperStyle={{ gap: 12 }}
-          contentContainerStyle={{
-            padding: 16,
-            gap: 12,
-            paddingBottom: insets.bottom + 8,
-          }}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.4}
-          showsVerticalScrollIndicator={false}
-          ListFooterComponent={
-            <View style={{ paddingVertical: 12, alignItems: 'center' }}>
-              <Loader
-                visible={loadingMore}
-                text="Carregando"
-                fullscreen={false}
-              />
-            </View>
-          }
-        />
+      <View style={[s.header, { paddingTop: topSafe + 12 }]}>
+        <Text style={s.title}>Escolha um modelo</Text>
+        <Text style={s.subtitle}>Divirta-se • toque para selecionar</Text>
       </View>
 
-      {/* Overlay global */}
+      <FlatList
+        data={items}
+        keyExtractor={it => String(it.id)}
+        numColumns={3}
+        renderItem={renderItem}
+        columnWrapperStyle={{
+          justifyContent: 'space-between',
+          marginBottom: gap,
+        }}
+        contentContainerStyle={{
+          paddingHorizontal: contentPadding,
+          paddingTop: 8,
+          paddingBottom: insets.bottom + 120,
+        }}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.4}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={
+          <View style={{ paddingVertical: 10, alignItems: 'center' }}>
+            <Loader
+              visible={loadingMore}
+              text="Carregando"
+              fullscreen={false}
+            />
+          </View>
+        }
+      />
+
+      <View style={[s.bottomBar, { paddingBottom: insets.bottom + 16 }]}>
+        <TouchableOpacity
+          activeOpacity={0.92}
+          onPress={goEditor}
+          disabled={!selectedTemplate || opening}
+          style={[s.cta, (!selectedTemplate || opening) && s.ctaDisabled]}
+        >
+          <Text style={s.ctaText}>Começar a criar</Text>
+        </TouchableOpacity>
+      </View>
+
       <Loader visible={opening} text="Abrindo..." />
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: WHITE },
-  header: { paddingHorizontal: 16, paddingBottom: 12, alignItems: 'center' },
-  appTitle: {
-    color: WHITE,
-    fontSize: 20,
-    fontWeight: '800',
-    marginBottom: 8,
+  safe: { flex: 1, backgroundColor: COLORS.bg },
+
+  header: { paddingHorizontal: 16, paddingBottom: 8, alignItems: 'center' },
+  title: {
+    color: COLORS.text,
+    fontSize: 22,
+    fontWeight: '900',
     textAlign: 'center',
   },
-  cta: {
-    backgroundColor: WHITE,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 24,
+  subtitle: {
+    color: COLORS.muted,
+    fontSize: 14,
+    marginTop: 6,
+    fontWeight: '600',
+    textAlign: 'center',
   },
-  ctaDisabled: { opacity: 0.5 },
-  ctaText: { color: '#B0001C', fontWeight: '800' },
-  body: { flex: 1, backgroundColor: WHITE },
-  card: {
-    flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 12,
+
+  // só imagem (sem card/sem footer)
+  thumb: {
+    borderRadius: 22,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#eee',
+    backgroundColor: COLORS.imageBg,
+    borderWidth: 2,
+    borderColor: 'transparent',
     position: 'relative',
   },
-  cardSelected: {
-    borderColor: '#FF002E',
-    shadowColor: '#FF405C',
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+  thumbSelected: {
+    borderColor: COLORS.primary,
   },
-  cardImg: { width: '100%', height: 180, backgroundColor: '#fff' },
-  cardFooter: { padding: 8, backgroundColor: '#fff' },
-  cardTitle: { color: '#111', fontSize: 14, fontWeight: '700' },
+  thumbImg: { width: '100%', height: '100%' },
+
   check: {
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: '#FF1738',
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkText: { color: WHITE, fontWeight: '900' },
+  checkText: { color: COLORS.primaryText, fontWeight: '900' },
+
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    backgroundColor: COLORS.bg,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  cta: {
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctaDisabled: { opacity: 0.5 },
+  ctaText: { color: COLORS.primaryText, fontSize: 16, fontWeight: '900' },
 });

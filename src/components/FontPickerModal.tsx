@@ -1,5 +1,4 @@
-// src/components/FontPickerModal.tsx
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   Modal,
   View,
@@ -11,7 +10,6 @@ import {
   StatusBar,
 } from 'react-native';
 
-// Definindo os tipos das fontes que o componente espera
 export interface FontOption {
   name: string;
   postscriptName: string;
@@ -25,9 +23,14 @@ interface FontPickerModalProps {
   onClose: () => void;
 }
 
-const RED = '#C00021';
-const WHITE = '#FFFFFF';
-const GRAY_BORDER = '#E5E7EB';
+const COLORS = {
+  bg: '#F5F6F8',
+  card: '#FFFFFF',
+  text: '#111827',
+  muted: '#6B7280',
+  border: '#E5E7EB',
+  primary: '#141419',
+};
 
 export default function FontPickerModal({
   visible,
@@ -36,28 +39,32 @@ export default function FontPickerModal({
   onSelectFont,
   onClose,
 }: FontPickerModalProps) {
-  // Função para renderizar cada item da lista
-  const renderFontItem = ({ item }: { item: FontOption }) => {
-    const isSelected = currentFont === item.postscriptName;
+  const renderFontItem = useCallback(
+    ({ item }: { item: FontOption }) => {
+      const selected = currentFont === item.postscriptName;
 
-    return (
-      <TouchableOpacity
-        style={s.itemContainer}
-        onPress={() => onSelectFont(item)}
-      >
-        <Text
-          style={[
-            s.itemText,
-            { fontFamily: item.postscriptName }, // Aplica a fonte para preview
-            isSelected && s.itemTextSelected,
-          ]}
+      return (
+        <TouchableOpacity
+          style={[s.item, selected && s.itemSelected]}
+          onPress={() => onSelectFont(item)}
+          activeOpacity={0.9}
         >
-          {item.name}
-        </Text>
-        {isSelected && <Text style={s.checkMark}>✓</Text>}
-      </TouchableOpacity>
-    );
-  };
+          <Text
+            style={[
+              s.itemText,
+              { fontFamily: item.postscriptName },
+              selected && s.itemTextSelected,
+            ]}
+            numberOfLines={1}
+          >
+            {item.name}
+          </Text>
+          {selected && <Text style={s.check}>✓</Text>}
+        </TouchableOpacity>
+      );
+    },
+    [currentFont, onSelectFont],
+  );
 
   return (
     <Modal
@@ -66,22 +73,28 @@ export default function FontPickerModal({
       visible={visible}
       onRequestClose={onClose}
     >
-      <SafeAreaView style={s.safeArea}>
-        <StatusBar barStyle="dark-content" backgroundColor={WHITE} />
-        {/* Header do Modal */}
+      <SafeAreaView style={s.safe}>
+        <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
+
         <View style={s.header}>
-          <Text style={s.headerTitle}>Escolha uma Fonte</Text>
-          <TouchableOpacity onPress={onClose} style={s.closeButton}>
-            <Text style={s.closeButtonText}>Fechar</Text>
+          <TouchableOpacity
+            onPress={onClose}
+            style={s.headerBtn}
+            activeOpacity={0.9}
+          >
+            <Text style={s.headerBtnText}>←</Text>
           </TouchableOpacity>
+
+          <Text style={s.headerTitle}>Escolha uma fonte</Text>
+          <View style={{ width: 44 }} />
         </View>
 
-        {/* Lista de Fontes */}
         <FlatList
           data={fonts}
           renderItem={renderFontItem}
           keyExtractor={item => item.postscriptName}
-          contentContainerStyle={s.listContainer}
+          contentContainerStyle={{ padding: 16, gap: 10 }}
+          showsVerticalScrollIndicator={false}
         />
       </SafeAreaView>
     </Modal>
@@ -89,54 +102,53 @@ export default function FontPickerModal({
 }
 
 const s = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: WHITE,
-  },
+  safe: { flex: 1, backgroundColor: COLORS.bg },
+
   header: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 10,
     flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: GRAY_BORDER,
   },
+  headerBtnText: { color: COLORS.text, fontSize: 18, fontWeight: '900' },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  closeButton: {
-    position: 'absolute',
-    right: 16,
-  },
-  closeButtonText: {
+    flex: 1,
+    textAlign: 'center',
+    color: COLORS.text,
     fontSize: 16,
-    color: RED,
-    fontWeight: '600',
+    fontWeight: '900',
   },
-  listContainer: {
-    paddingVertical: 8,
-  },
-  itemContainer: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+
+  item: {
+    backgroundColor: COLORS.card,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: GRAY_BORDER,
+    justifyContent: 'space-between',
   },
+  itemSelected: { borderColor: COLORS.primary, borderWidth: 2 },
   itemText: {
-    fontSize: 22,
-    color: '#374151',
+    fontSize: 18,
+    color: COLORS.text,
+    fontWeight: '800',
+    flex: 1,
+    paddingRight: 12,
   },
-  itemTextSelected: {
-    color: RED,
-    fontWeight: '700',
-  },
-  checkMark: {
-    fontSize: 20,
-    color: RED,
-  },
+  itemTextSelected: { color: COLORS.primary },
+  check: { fontSize: 18, color: COLORS.primary, fontWeight: '900' },
 });
