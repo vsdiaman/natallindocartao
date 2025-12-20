@@ -65,6 +65,9 @@ export default function HomeScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [opening, setOpening] = useState(false);
 
+  const gap = 12;
+  const contentPadding = 16;
+
   const selectedTemplate = useMemo(() => {
     if (!selectedId) return null;
     return (
@@ -73,9 +76,6 @@ export default function HomeScreen() {
       null
     );
   }, [items, selectedId]);
-
-  const gap = 12;
-  const contentPadding = 16;
 
   const cardSize = useMemo(() => {
     const available = width - contentPadding * 2 - gap * 2;
@@ -111,8 +111,9 @@ export default function HomeScreen() {
   }, [navigate, selectedTemplate]);
 
   const renderItem = useCallback(
-    ({ item }: { item: Template }) => {
+    ({ item, index }: { item: Template; index: number }) => {
       const selected = item.id === selectedId;
+      const isLastColumn = index % 3 === 2;
 
       return (
         <TouchableOpacity
@@ -120,15 +121,16 @@ export default function HomeScreen() {
           onPress={() => setSelectedId(item.id)}
           style={[
             s.thumb,
-            { width: cardSize, height: cardSize },
+            {
+              width: cardSize,
+              height: cardSize,
+              marginRight: isLastColumn ? 0 : gap,
+              marginBottom: gap,
+            },
             selected && s.thumbSelected,
           ]}
         >
-          <Image
-            source={item.image}
-            style={s.thumbImg}
-            resizeMode="cover" // se não quiser cortar, troca para "contain"
-          />
+          <Image source={item.image} style={s.thumbImg} resizeMode="cover" />
 
           {selected && (
             <View style={s.check}>
@@ -138,7 +140,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       );
     },
-    [cardSize, selectedId],
+    [cardSize, gap, selectedId],
   );
 
   return (
@@ -155,10 +157,7 @@ export default function HomeScreen() {
         keyExtractor={it => String(it.id)}
         numColumns={3}
         renderItem={renderItem}
-        columnWrapperStyle={{
-          justifyContent: 'space-between',
-          marginBottom: gap,
-        }}
+        columnWrapperStyle={{ justifyContent: 'flex-start' }}
         contentContainerStyle={{
           paddingHorizontal: contentPadding,
           paddingTop: 8,
@@ -212,18 +211,16 @@ const s = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // só imagem (sem card/sem footer)
+  // thumb (só imagem)
   thumb: {
-    borderRadius: 22,
+    borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: COLORS.imageBg,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'transparent',
     position: 'relative',
   },
-  thumbSelected: {
-    borderColor: COLORS.red,
-  },
+  thumbSelected: { borderColor: COLORS.red },
   thumbImg: { width: '100%', height: '100%' },
 
   check: {

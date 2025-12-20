@@ -25,6 +25,25 @@ const COLORS = {
   border: 'rgb(229,231,235)',
   primary: 'rgb(20,20,25)',
   primaryText: 'rgb(255,255,255)',
+  // extras (15+)
+  red: '#EF4444',
+  redDark: '#B91C1C',
+  yellow: '#F59E0B',
+  yellowSoft: '#FDE68A',
+  blue: '#3B82F6',
+  blueDark: '#1D4ED8',
+  green: '#22C55E',
+  emerald: '#10B981',
+  beige: '#F5E6D3',
+  sand: '#E7D3B0',
+  brown: '#8B5E34',
+  brownDark: '#5A3E2B',
+  wine: '#7F1D1D',
+  purple: '#8B5CF6',
+  pink: '#EC4899',
+  cyan: '#06B6D4',
+  orange: '#F97316',
+  graySoft: '#F3F4F6',
 };
 
 type Step = {
@@ -154,10 +173,10 @@ export default function IntroScreen() {
         <LinearGradient
           // estilo da imagem: azul/roxo suave
           colors={[
-            'rgb(164, 224, 255)',
-            'rgb(153, 201, 255)',
-            'rgb(154, 178, 255)',
-            'rgb(191, 170, 255)',
+            'rgba(239, 29, 29, 1)',
+            'rgba(236, 63, 63, 1)',
+            'rgba(253, 78, 78, 1)',
+            'rgba(255, 0, 0, 1)',
           ]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -170,7 +189,7 @@ export default function IntroScreen() {
         <View style={{ width: 64 }} />
         <Text style={s.brand}>Natal Lindo Cartão</Text>
         <TouchableOpacity onPress={goHome} hitSlop={10} style={s.skipBtn}>
-          <Text style={s.skip}>Pular</Text>
+          <Text style={[s.skip, { color: COLORS.primary }]}>Pular</Text>
         </TouchableOpacity>
       </View>
 
@@ -225,7 +244,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  brand: { color: COLORS.text, fontSize: 16, fontWeight: '900' },
+  brand: { color: COLORS.graySoft, fontSize: 23, fontWeight: '600' },
   skipBtn: { width: 64, alignItems: 'flex-end' },
   skip: { color: COLORS.muted, fontSize: 14, fontWeight: '800' },
 
@@ -316,19 +335,19 @@ const s = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: 'rgba(255,255,255,0.55)',
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
   },
   dotActive: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.beige,
   },
 
   cta: {
     height: 54,
     borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.redDark,
     alignItems: 'center',
     justifyContent: 'center',
   },
