@@ -1,3 +1,4 @@
+// src/screens/EditorScreen.tsx
 import React, { useMemo, useRef, useState, useCallback } from 'react';
 import {
   View,
@@ -32,6 +33,7 @@ type NavProp = NativeStackNavigationProp<RootStackParamList>;
 const COLORS = {
   // base
   bg: '#F5F6F8',
+  card: '#FFFFFF',
   text: '#111827',
   muted: '#6B7280',
   border: '#E5E7EB',
@@ -72,6 +74,8 @@ const QUICK_COLORS = [
   '#0000FF',
 ] as const;
 
+type Align = 'left' | 'center' | 'right' | 'justify';
+
 export default function EditorScreen({ route }: { route: EditorRouteProp }) {
   const navigation = useNavigation<NavProp>();
   const insets = useSafeAreaInsets();
@@ -102,8 +106,10 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
     AVAILABLE_FONTS[0].postscriptName,
   );
 
-  const [isFontModalVisible, setFontModalVisible] = useState(false);
+  const [titleAlign, setTitleAlign] = useState<Align>('center');
+  const [messageAlign, setMessageAlign] = useState<Align>('center');
 
+  const [isFontModalVisible, setFontModalVisible] = useState(false);
   const [working, setWorking] = useState(false);
 
   const topSafe = useMemo(() => {
@@ -131,6 +137,15 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
   const selectedSize = activeTarget === 'title' ? titleSize : messageSize;
   const selectedColor = activeTarget === 'title' ? titleColor : messageColor;
   const selectedFont = activeTarget === 'title' ? titleFont : messageFont;
+  const selectedAlign = activeTarget === 'title' ? titleAlign : messageAlign;
+
+  // ===== ALTERAÇÃO: limitar a largura do texto (coluna) =====
+  // deixa responsivo e permite "justify" funcionar de verdade
+  const textMaxWidth = useMemo(() => {
+    if (size.w <= 0) return 320;
+    return Math.max(220, Math.min(420, Math.round(size.w * 0.82)));
+  }, [size.w]);
+  // =========================================================
 
   const selectedFontName = useMemo(() => {
     return (
@@ -161,6 +176,14 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
       if (activeTarget === 'title') setTitleFont(font.postscriptName);
       else setMessageFont(font.postscriptName);
       setFontModalVisible(false);
+    },
+    [activeTarget],
+  );
+
+  const setSelectedAlign = useCallback(
+    (align: Align) => {
+      if (activeTarget === 'title') setTitleAlign(align);
+      else setMessageAlign(align);
     },
     [activeTarget],
   );
@@ -303,10 +326,12 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
                   style={[
                     s.previewTitle,
                     {
+                      maxWidth: textMaxWidth, // <<< ALTERAÇÃO
                       color: titleColor,
                       fontSize: titleSize,
                       lineHeight: titleSize * 1.15,
                       fontFamily: titleFont,
+                      textAlign: titleAlign,
                     },
                   ]}
                 >
@@ -320,10 +345,12 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
                   style={[
                     s.previewMessage,
                     {
+                      maxWidth: textMaxWidth, // <<< ALTERAÇÃO
                       color: messageColor,
                       fontSize: messageSize,
                       lineHeight: messageSize * 1.2,
                       fontFamily: messageFont,
+                      textAlign: messageAlign,
                     },
                   ]}
                 >
@@ -333,29 +360,6 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
             )}
           </ImageBackground>
         </ViewShot>
-
-        {/* Ferramentas (visual) */}
-        <View style={s.toolsCard}>
-          <Text style={s.sectionTitle}>Ferramentas</Text>
-          <View style={s.toolsRow}>
-            <View style={s.tool}>
-              <Text style={s.toolIcon}>T</Text>
-              <Text style={s.toolText}>Texto</Text>
-            </View>
-            <View style={s.tool}>
-              <Text style={s.toolIcon}>☺</Text>
-              <Text style={s.toolText}>Figurinhas</Text>
-            </View>
-            <View style={s.tool}>
-              <Text style={s.toolIcon}>▢</Text>
-              <Text style={s.toolText}>Molduras</Text>
-            </View>
-            <View style={s.tool}>
-              <Text style={s.toolIcon}>◼</Text>
-              <Text style={s.toolText}>Fundo</Text>
-            </View>
-          </View>
-        </View>
 
         {/* Form */}
         <View style={s.panel}>
@@ -408,6 +412,35 @@ export default function EditorScreen({ route }: { route: EditorRouteProp }) {
                 Mensagem
               </Text>
             </TouchableOpacity>
+          </View>
+
+          {/* ALINHAMENTO */}
+          <Text style={s.label}>Alinhamento</Text>
+          <View style={s.alignRow}>
+            {(['left', 'center', 'right', 'justify'] as const).map(a => {
+              const active = selectedAlign === a;
+              const label =
+                a === 'left'
+                  ? 'Esq'
+                  : a === 'center'
+                  ? 'Centro'
+                  : a === 'right'
+                  ? 'Dir'
+                  : 'Just';
+
+              return (
+                <TouchableOpacity
+                  key={a}
+                  onPress={() => setSelectedAlign(a)}
+                  activeOpacity={0.9}
+                  style={[s.alignBtn, active && s.alignBtnActive]}
+                >
+                  <Text style={[s.alignText, active && s.alignTextActive]}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           <Text style={s.label}>Cores rápidas</Text>
@@ -530,13 +563,6 @@ const s = StyleSheet.create({
     fontWeight: '900',
   },
 
-  previewCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 12,
-  },
   preview: { aspectRatio: 3 / 4 },
   previewImage: { resizeMode: 'cover' },
   overlay: {
@@ -545,38 +571,6 @@ const s = StyleSheet.create({
   },
   previewTitle: { textAlign: 'center' },
   previewMessage: { textAlign: 'center' },
-
-  toolsCard: {
-    marginTop: 12,
-    backgroundColor: COLORS.card,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 14,
-  },
-  sectionTitle: { color: COLORS.text, fontSize: 14, fontWeight: '900' },
-  toolsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-  },
-  tool: {
-    width: '23%',
-    height: 86,
-    borderRadius: 18,
-    backgroundColor: '#EEF1F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  toolIcon: { color: COLORS.text, fontSize: 22, fontWeight: '900' },
-  toolText: {
-    color: COLORS.muted,
-    fontSize: 12,
-    fontWeight: '800',
-    marginTop: 6,
-  },
 
   panel: {
     marginTop: 12,
@@ -618,6 +612,27 @@ const s = StyleSheet.create({
   segmentActive: { borderColor: COLORS.primary, backgroundColor: '#EEF1F6' },
   segmentText: { color: COLORS.text, fontSize: 12, fontWeight: '900' },
   segmentTextActive: { color: COLORS.primary },
+
+  // alinhamento
+  alignRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 2,
+    marginBottom: 12,
+  },
+  alignBtn: {
+    flex: 1,
+    height: 40,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  alignBtnActive: { borderColor: COLORS.primary, backgroundColor: '#EEF1F6' },
+  alignText: { color: COLORS.text, fontSize: 12, fontWeight: '900' },
+  alignTextActive: { color: COLORS.primary },
 
   colorsRow: {
     flexDirection: 'row',
